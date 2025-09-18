@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QTextEdit, QMainWindow, QPushButton, QVBoxLayout, QWidget)
 
 import PySide6.QtAsyncio as QtAsyncio
 
@@ -17,6 +17,7 @@ from sportident import SIReaderReadout
 class MainWindow(QMainWindow):
     
     reader_port = ''
+    CURRENT_COURSE = [31, 32, 33, 34, 35]
 
     def __init__(self):
         super().__init__()
@@ -26,25 +27,28 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout(widget)
 
-        self.text = QLabel("Card ID: Unknown")
+        self.text = QLabel(f"Course: {self.CURRENT_COURSE}")
         layout.addWidget(self.text, alignment=Qt.AlignmentFlag.AlignCenter)
-        
+
+        self.text = QLabel("Card Data: Unknown")
+        layout.addWidget(self.text, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.results = QLabel("Results: Unknown", textFormat=Qt.TextFormat.RichText)
+        layout.addWidget(self.results, alignment=Qt.AlignmentFlag.AlignCenter)
+
         self.port_picker = QComboBox()
         ports = []
         for port in serial.tools.list_ports.comports():
             ports.append(port.device)
         self.port_picker.addItems(ports)
         self.port_picker.currentTextChanged.connect(self.port_changed)
-        
+
         layout.addWidget(self.port_picker)
 
         self.async_trigger = QPushButton(text="Poll for SI Card")
         self.async_trigger.clicked.connect(lambda: asyncio.ensure_future(self.read_card()))
-        
-        layout.addWidget(self.async_trigger, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # self.test_button = QPushButton(text="Poll for SI Card")
-        # layout.addWidget(self.test_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.async_trigger, alignment=Qt.AlignmentFlag.AlignCenter)
 
     def port_changed(self, selected_port):
         print(f"port selected: {selected_port}")
@@ -68,6 +72,18 @@ class MainWindow(QMainWindow):
     async def read_card(self):
         response = await self.wait_for_card_connection()
         self.text.setText(f"Card ID: {response['id']}\nCard Type: {response['type']}\nCard Data: {pprint.pformat(response['data'])}")
+        print(pprint.pformat(response['data']))
+
+        self.results.setText(self.get_runner_results(response['data'], self.CURRENT_COURSE))
+
+    def get_runner_results(self, card_data, course_data):
+        runner_punches = [ punch[0] for punch in card_data['punches'] ]
+        result = f"<p>Your punches: {runner_punches}</p><p>Current course: {course_data}</p>"
+        if course_data == runner_punches:
+            result += f"<p><font color=\"green\">Great job!! :)</font></p>"
+        else:
+            result += f"<p><font color=\"red\">Oh no! There was a mistake :(</font></p>"
+        return result
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
