@@ -85,9 +85,12 @@ class MainWindow(QMainWindow):
             result += f"<p><font color=\"red\">Oh no! There was a mistake :(</font></p>"
         return result
 
-if __name__ == "__main__":
+def main():
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
 
     QtAsyncio.run(handle_sigint=True)
+    
+if __name__ == '__main__':
+    main()
