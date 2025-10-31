@@ -4,14 +4,17 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 
-Page {
+
+ApplicationWindow {
+    visible: true
     width: 640
     height: 480
     required property var myModel
+    property var currTime: '1'
 
     header: Label {
         color: "#15af15"
-        text: "Where do people use Qt?"
+        text: currTime
         font.pointSize: 17
         font.bold: true
         font.family: "Arial"
