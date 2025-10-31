@@ -163,9 +163,12 @@ class MainWindow(QMainWindow):
         
         return correctness_array
 
-if __name__ == "__main__":
+def main():
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
 
     QtAsyncio.run(handle_sigint=True)
+    
+if __name__ == '__main__':
+    main()
