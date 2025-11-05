@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
 
                 da[cs1] = i
 
-            course_distances([course]) = d[len1, len2]
+            course_distances[course] = d[len1, len2]
 
         return min(course_distances, key=course_distances.get)
 
