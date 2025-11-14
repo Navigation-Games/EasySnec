@@ -7,6 +7,7 @@ import pytest
 from easysnec.utils.grading import Course
 from easysnec.utils.grading import InputData
 from easysnec.utils.grading import OutputData, SuccessStatus
+import uuid
 
 
 @pytest.fixture
@@ -32,7 +33,8 @@ def example_input_success(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id="202503140930170000000123",
+        reading_id=uuid.uuid4()
+        # "202503140930170000000123",
     )
 
 
@@ -59,7 +61,8 @@ def example_input_incomplete(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id="202503140930170000000123",
+        reading_id=uuid.uuid4()
+        # reading_id="202503140930170000000123",
     )
 
 
@@ -85,7 +88,8 @@ def example_input_misses(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id="202503140930170000000123",
+        reading_id=uuid.uuid4()
+        # reading_id="202503140930170000000123",
     )
 
 
@@ -112,7 +116,8 @@ def example_input_wrong_order(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id="202503140930170000000123",
+        reading_id=uuid.uuid4()
+        # reading_id="202503140930170000000123",
     )
 
 
@@ -139,7 +144,8 @@ def example_input_not_started(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id="202503140930170000000123",
+        reading_id=uuid.uuid4()
+        # reading_id="202503140930170000000123",
     )
 
 

@@ -28,6 +28,7 @@ dependencies = [
     { name = "fastlog" },
     { name = "pyserial" },
     { name = "pyside6" },
+    { name = "pyxdameraulevenshtein" },
     { name = "sireader" },
     { name = "sportident" },
 ]
@@ -43,6 +44,7 @@ requires-dist = [
     { name = "fastlog" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyside6", specifier = ">=6.9.2" },
+    { name = "pyxdameraulevenshtein", specifier = ">=1.9.0" },
     { name = "sireader", specifier = ">=1.1.3" },
     { name = "sportident", specifier = ">=1.2.8" },
 ]
@@ -280,6 +282,30 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79", size = 365750, upload-time = "2025-09-04T14:34:20.226Z" },
+]
+
+[[package]]
+name = "pyxdameraulevenshtein"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/88/db/b529c031e92a36ded5cca06b48e31e4e2a388da231de84ccb383c8e27af1/pyxDamerauLevenshtein-1.9.0.tar.gz", hash = "sha256:50c84b1b7272c4f1dcee732d6b1713f4871921c99e4cf80e722c65928ca94ce1", size = 73255, upload-time = "2025-10-01T03:55:24.931Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/5e/f3b7c546274a9f908e307d9811c1e25da21df33a288a14b5edc54b0d8bfc/pyxdameraulevenshtein-1.9.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:b77f6d620ee0a1706005033db847897e22dddfaa152dfa3b4babde1de880c194", size = 32639, upload-time = "2025-10-01T03:55:46.017Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/30/dabd621749c4a2138ee2805e0d12235abdfa25e4c3a4a9397de0b20028e7/pyxdameraulevenshtein-1.9.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:11ff877684aef45045896234383e216a9e55083cc1eb139e9d19579f894f459e", size = 38198, upload-time = "2025-10-01T03:55:32.211Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/8d/4918da22a6e7416b5bd834cf0ba5cebb440f3cb0f19dd46cb12f5aae630d/pyxdameraulevenshtein-1.9.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:2b33d87166eaa9133903a163dcca71fd35a7f20a6c62929187958c6a5e87359f", size = 38563, upload-time = "2025-10-01T03:55:27.02Z" },
+    { url = "https://files.pythonhosted.org/packages/28/22/fd466f404e7f1a8d3fe307121a796ad2100ad837863d51f36a747aca2678/pyxdameraulevenshtein-1.9.0-cp311-cp311-win_amd64.whl", hash = "sha256:42e96b2d340ecb60cd5bba31766d783f5e1175fa63c7973b61e33c2fdffdd771", size = 30924, upload-time = "2025-10-01T03:55:44.627Z" },
+    { url = "https://files.pythonhosted.org/packages/09/63/30eaa6afc04dde862d065610fe9ebfff41ef9d8e649123ec1ca210e7bc41/pyxdameraulevenshtein-1.9.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:da7c92122d5ee79567e3d76fcc5aadd4f410147220ffa0dae593215499bdacd3", size = 34256, upload-time = "2025-10-01T03:55:26.189Z" },
+    { url = "https://files.pythonhosted.org/packages/59/44/718f30689abad45ac91b39d1d48b8c06763cce660dc14592ed31050e1c81/pyxdameraulevenshtein-1.9.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:5d765d8df20fa316f95d8243d07c3cb74acd398e8b6e8106ac7e9eee7f1311a2", size = 40042, upload-time = "2025-10-01T03:55:26.891Z" },
+    { url = "https://files.pythonhosted.org/packages/73/05/c0e78f56d2e9ad3a39130ad1dff9e05312e980e3b48b5dc00947a61a12f1/pyxdameraulevenshtein-1.9.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:7b88e8b63eb1e202966039c4616e9ff2e66aa9cf8c3190fcb189a0dfcd7e3733", size = 40286, upload-time = "2025-10-01T03:55:23.579Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/bd/264dc2db346a212435758a62c764966cd80e1ac3b8ce52193054d53ccb9e/pyxdameraulevenshtein-1.9.0-cp312-cp312-win_amd64.whl", hash = "sha256:58e154aa03507673bb2f2992910445f955c683f73e62612f947175bbee04cd72", size = 31260, upload-time = "2025-10-01T03:55:29.961Z" },
+    { url = "https://files.pythonhosted.org/packages/f2/67/5c09904a49a373c5e1786fac4ce8d41e16a1f3e699aff70b1394e1bf2dc4/pyxdameraulevenshtein-1.9.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:e7e31e41e9cd8491953bd0d044e90f414651d9a6ac0d85ffcc630d591a8b2887", size = 33912, upload-time = "2025-10-01T03:55:26.353Z" },
+    { url = "https://files.pythonhosted.org/packages/de/60/c5c188056f0a3494b0b8b4b6b0ce491b6fb52506376643c39a59f455aaf6/pyxdameraulevenshtein-1.9.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:e862112872e3b20add261fe854408ba98787009d7d80cebb2057b23026bb9e83", size = 39483, upload-time = "2025-10-01T03:57:46.263Z" },
+    { url = "https://files.pythonhosted.org/packages/85/5f/a8aafec9dbec6d111a7f64a3dc200a47fa0b0a7d02724fbd0e66604d87bc/pyxdameraulevenshtein-1.9.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:6bc6c4e45b6538fb8c32de57ffcf0b900b5637ee49c3afe497d19e5fbff32e61", size = 39744, upload-time = "2025-10-01T03:57:48.582Z" },
+    { url = "https://files.pythonhosted.org/packages/de/06/800f8e9060f7516bb7482bbec3f9f59d1eb57b34088d4df2abfa7bce1ff5/pyxdameraulevenshtein-1.9.0-cp313-cp313-win_amd64.whl", hash = "sha256:6e6d0961ffe8f660034dcd343b74775232c3bc1a4bcb27dba7059ca7fb82bcb9", size = 30867, upload-time = "2025-10-01T03:55:48.229Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/54/fcad685b7950f21ac5625740e21d89757d941b64731dbcc7a61c9b97f8fe/pyxdameraulevenshtein-1.9.0-cp314-cp314-macosx_10_13_x86_64.whl", hash = "sha256:1088e94dae9f03e6eb16a4b470105cd877dfead5aa27a3cb264eb6c08ee2d900", size = 33845, upload-time = "2025-10-01T03:55:26.288Z" },
+    { url = "https://files.pythonhosted.org/packages/42/fa/7a5a8bba8005d51d6b0f1d303c3f4dc251385496544b049312a8362f8a19/pyxdameraulevenshtein-1.9.0-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl", hash = "sha256:b47ff2c63086fccc01ba21367620f1859e599406bdb8d0a81c8f726b6f82a6df", size = 39510, upload-time = "2025-10-01T03:55:24.941Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/85/1cae187bb710ebb2b4b68523ae0aefbd7a23aac448f89c441c93e0a405cb/pyxdameraulevenshtein-1.9.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:4e64d4f63c21a8e172eb355eb16efff4709c512075a7b7982d8b9f74efe4b361", size = 39840, upload-time = "2025-10-01T03:55:24.994Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/7b/2d02a4f90ee80ac58eb23b30bbdfddd702935f602e509fa1e4f5ef5ed53e/pyxdameraulevenshtein-1.9.0-cp314-cp314-win_amd64.whl", hash = "sha256:589fd042e3c35c3de65c917d289def6524252c706fa359a15eb7ad33bae371de", size = 31662, upload-time = "2025-10-01T03:55:32.29Z" },
 ]
 
 [[package]]

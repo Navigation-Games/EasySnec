@@ -1,10 +1,13 @@
 from __future__ import annotations
 # from pydantic.dataclasses import dataclass
 from dataclasses import dataclass
+from functools import cached_property
 from enum import Enum
 import datetime as dt
 
 import uuid
+from pyxdameraulevenshtein import damerau_levenshtein_distance
+from typing import Iterable
 
 
 class SuccessStatus(Enum):
@@ -17,97 +20,62 @@ class InputData:
     card_id: int
     start_time: dt.datetime
     finish_time: dt.datetime
-    punches: list[tuple[int, dt.datetime]]
-    reading_id: str
-
-    def score_against(self, course:Course):
-        return get_correctness_of_course(self, course)
+    punches: list[tuple[int, dt.datetime]]  # TODO: split into punches and times???
+    reading_id: uuid.UUID # TODO: this should be generated internally, and not taken as an arg
 
     @classmethod
     def from_si_result(self, si_result:dict):
+        # TODO: this seems like exactly the sort of thing Pydantic is well suited for
         return InputData(
             card_id = si_result['card_number'],
             start_time = si_result['start'],
             finish_time = si_result['finish'],
             punches = si_result['punches'],
-            reading_id = uuid.uuid5(),
+            reading_id = uuid.uuid4(),
             # other keys: 'check' (datetime), 'clear' (usually None)
         )
 
-@dataclass(frozen=True)
-class OutputData:
-    # this is your test result - what you got right, what you got wrong
-    course_name: str
-    success_status: SuccessStatus
-    missed_checkpoints: list[int]
+    def get_closest_course(self, courses:Iterable[Course]):
+        punch_ids = [ punch[0] for punch in self.punches ]
+
+        # return the course most similar to what the user did, according to damerau_levenshtein
+        return min(courses, key=lambda course: damerau_levenshtein_distance(punch_ids, course.stations))
+
+    
+    def score_against(self, course:Course):
+        #TODO: make buffer array that helps display which stations are wrong compared to correct course 
+        # See: triResultatsScore() and getMissed() in ResultatPuce.java from EasyGecNG
+        punches = [ punch[0] for punch in self.punches ]
+
+        # temp solution
+        return course.stations == punches
+
+        # actual solution
+        return Grade(self, course)
 
 
 @dataclass(frozen=True)
-class Course:
-    course_name: str
-    is_score_o: bool
-    stations: list[int]
+class Grade:
+    input: InputData
+    course: Course
 
+    @cached_property
+    def status(self) -> SuccessStatus:
+        if not (self.input.finish_time and self.input.start_time):
+            return SuccessStatus.INCOMPLETE
+        elif self.course.stations == self.input.punches:
+            return SuccessStatus.SUCCESS
+        else:
+            return SuccessStatus.MISSES
 
-def get_closest_course(card_data, courses):
-    # fastDamerauLevenshtein
-    # https://pypi.org/project/fastDamerauLevenshtein/#files
-    s1 = [ punch[0] for punch in card_data['punches'] ]
-    course_distances = {}
-
-    for course in courses:
-        s2 = course
+    @cached_property
+    def missed_checkpoints(self) -> list[int]:
+        if self.status is SuccessStatus.SUCCESS:
+            return []
+        # find missed checkpoints
+        raise NotImplementedError
         
-        d: dict[tuple[int, int], int] = {}
-        da: dict[T, int] = {}
-
-        len1 = len(s1)
-        len2 = len(s2)
-
-        maxdist = len1 + len2
-        d[-1, -1] = maxdist
-
-        # matrix
-        for i in range(len(s1) + 1):
-            d[i, -1] = maxdist
-            d[i, 0] = i
-        for j in range(len(s2) + 1):
-            d[-1, j] = maxdist
-            d[0, j] = j
-
-        for i, cs1 in enumerate(s1, start=1):
-            db = 0
-            for j, cs2 in enumerate(s2, start=1):
-                i1 = da.get(cs2, 0)
-                j1 = db
-                if self.test_func(cs1, cs2):
-                    cost = 0
-                    db = j
-                else:
-                    cost = 1
-
-                d[i, j] = min(
-                    d[i - 1, j - 1] + cost,     # substitution (wrong station)
-                    d[i, j - 1] + 1,            # insertion (missed station)
-                    d[i - 1, j] + 1,            # deletion (extra station)
-                    d[i1 - 1, j1 - 1] + (i - i1) - 1 + (j - j1),  # transposition (swapped stations)
-                )
-
-            da[cs1] = i
-
-        course_distances[course] = d[len1, len2]
-
-    return min(course_distances, key=course_distances.get)
-
-
-
-def get_correctness_of_course(card_data, course):
-    # todo: make buffer array that helps display which stations are wrong compared to correct course 
-    # See: triResultatsScore() and getMissed() in ResultatPuce.java from EasyGecNG
-    punches = [ punch[0] for punch in card_data['punches'] ]
-
-    # temp solution
-    return course == punches
+        # find missed checkpoints
 
         # buffer_string = ""
         # bufferBool = True
@@ -121,6 +89,20 @@ def get_correctness_of_course(card_data, course):
         #             punches[i] = punches[i + 1]
         #             punches[i + 1] = buffer_string
         #             unsorted = True
+
+
+@dataclass(frozen=True)
+class OutputData:
+    # this is your test result - what you got right, what you got wrong
+    course_name: str
+    success_status: SuccessStatus
+    missed_checkpoints: list[int]
+
+@dataclass(frozen=True)
+class Course:
+    course_name: str
+    is_score_o: bool
+    stations: list[int]
     
 
 COURSES = [

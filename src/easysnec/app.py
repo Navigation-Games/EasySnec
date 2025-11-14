@@ -1,7 +1,10 @@
+import json
 import pprint
 import sys
-import json
+
+from fastlog import log
 from pathlib import Path
+from sportident import SIReaderReadout, SIReaderCardChanged
 from time import strftime, localtime
 
 from PySide6.QtQuick import QQuickView
@@ -9,9 +12,8 @@ from PySide6.QtCore import QStringListModel, QUrl, QTimer, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-from sportident import SIReaderReadout, SIReaderCardChanged
-from fastlog import log
-from .utils.grading import get_correctness_of_course, CURRENT_COURSE, InputData
+from .utils.grading import COURSES, InputData
+
 
 class ReaderThread(QThread):
     def __init__(self, engine):
@@ -36,26 +38,24 @@ class ReaderThread(QThread):
                     pass
 
                 # process output
-                card_number = si.sicard
-                card_type = si.cardtype
-
-                card_data = si.read_sicard()
-                log.info(card_data)
-                # input_data = InputData.from_si_result(card_data)
+                input_data = InputData.from_si_result(si.read_sicard())
             except SIReaderCardChanged:
                 # this exception (card removed too early) can be ignored 
                 pass
 
             # beep
             si.ack_sicard()
-            response = { 'id': card_number, 'type': card_type, 'data': card_data }
-
+            
             # grade response
-            # TODO: when multiple courses are available, get_closest_course before grading
-            runner_correct = get_correctness_of_course(card_data, CURRENT_COURSE.stations)
+            # runner_correct = get_correctness_of_course(card_data, CURRENT_COURSE.stations)
+            # runner_correct = input_data.score_against(CURRENT_COURSE)
+            
+            # when multiple courses are available, get_closest_course before grading
+            best_guess_course = input_data.get_closest_course(COURSES)
+            runner_correct = input_data.score_against(best_guess_course)
 
-            log.debug(pprint.pformat(response))
             log.debug("Correctness: " + pprint.pformat(runner_correct))
+            
             # Put stuff in the UI
             if runner_correct:
                 self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-good-green.png')
@@ -64,15 +64,6 @@ class ReaderThread(QThread):
 
 
 def main() -> None:
-    # Data nonsense we will not keep
-    # TODO: Delete
-    # get our data
-    # url = "http://country.io/names.json"
-    # response = urllib.request.urlopen(url)
-    # data = json.loads(response.read().decode('utf-8'))
-    # # Format and sort the data
-    # data_list = sorted(list(data.values()))
-    # # Expose the list to the Qml code
     # my_model = QStringListModel()
     # my_model.setStringList(data_list)
 
