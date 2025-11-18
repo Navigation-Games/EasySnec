@@ -12,7 +12,7 @@ from PySide6.QtCore import QStringListModel, QUrl, QTimer, QThread
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-from .utils.grading import COURSES, InputData
+from .utils.grading import COURSES, InputData, Grade, ScoreType
 
 
 class ReaderThread(QThread):
@@ -54,6 +54,7 @@ class ReaderThread(QThread):
             best_guess_course = input_data.get_closest_course(COURSES)
             runner_correct = input_data.score_against(best_guess_course)
 
+            # Grade(input_data, best_guess_course, ScoreType.ANIMAL_O).score
             log.debug("Correctness: " + pprint.pformat(runner_correct))
             
             # Put stuff in the UI

@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import datetime as dt
-
 import pytest
+import uuid
+import typeguard
+
+# this will add type checking to all functions we declare. Ideally this would go in pyproject.toml, however 
+# then the following imports would slip through, as pytest runs the conftest first
+typeguard.install_import_hook("easysnec")
 
 from easysnec.utils.grading import Course
 from easysnec.utils.grading import InputData
 from easysnec.utils.grading import OutputData, SuccessStatus
-import uuid
-
 
 @pytest.fixture
 def example_course() -> Course:

@@ -1,19 +1,32 @@
 from __future__ import annotations
+
+import datetime as dt
+import pydantic
+import uuid
+
 # from pydantic.dataclasses import dataclass
 from dataclasses import dataclass
-from functools import cached_property
 from enum import Enum
-import datetime as dt
-
-import uuid
+from functools import cached_property
 from pyxdameraulevenshtein import damerau_levenshtein_distance
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Literal
+
+
+
+def typed_function(a:int, b:str, c:bool) -> None:
+    print(a, b, c)
 
 
 class SuccessStatus(Enum):
     SUCCESS = 1
     INCOMPLETE = 2  # no start/finish time or start >= finish
     MISSES = 3  # or wrong order
+
+class ScoreType(Enum):
+    SCORE_O = 1
+    CLASSIC_O = 2
+    ANIMAL_O = 2 # Looks exactly like score-o from our perspective
 
 @dataclass(frozen=True)
 class InputData:
@@ -24,7 +37,7 @@ class InputData:
     reading_id: uuid.UUID # TODO: this should be generated internally, and not taken as an arg
 
     @classmethod
-    def from_si_result(self, si_result:dict):
+    def from_si_result(self, si_result:dict) -> InputData:
         # TODO: this seems like exactly the sort of thing Pydantic is well suited for
         return InputData(
             card_id = si_result['card_number'],
@@ -35,20 +48,22 @@ class InputData:
             # other keys: 'check' (datetime), 'clear' (usually None)
         )
 
-    def get_closest_course(self, courses:Iterable[Course]):
-        punch_ids = [ punch[0] for punch in self.punches ]
+    @cached_property
+    def stations(self) -> list[int]:
+        return [ punch[0] for punch in self.punches ]
+
+    def get_closest_course(self, courses:Iterable[Course]) -> Course:
 
         # return the course most similar to what the user did, according to damerau_levenshtein
-        return min(courses, key=lambda course: damerau_levenshtein_distance(punch_ids, course.stations))
+        return min(courses, key=lambda course: damerau_levenshtein_distance(self.stations, course.stations))
 
     
     def score_against(self, course:Course):
         #TODO: make buffer array that helps display which stations are wrong compared to correct course 
         # See: triResultatsScore() and getMissed() in ResultatPuce.java from EasyGecNG
-        punches = [ punch[0] for punch in self.punches ]
 
         # temp solution
-        return course.stations == punches
+        return course.stations == self.stations
 
         # actual solution
         return Grade(self, course)
@@ -58,15 +73,29 @@ class InputData:
 class Grade:
     input: InputData
     course: Course
+    score_type: ScoreType
 
     @cached_property
     def status(self) -> SuccessStatus:
         if not (self.input.finish_time and self.input.start_time):
             return SuccessStatus.INCOMPLETE
-        elif self.course.stations == self.input.punches:
+        elif self.course.stations == self.input.stations:
             return SuccessStatus.SUCCESS
         else:
             return SuccessStatus.MISSES
+
+    @cached_property
+    def score(self) -> int:
+        match self.score_type:
+            case ScoreType.SCORE_O:
+                # return num matching
+                raise NotImplementedError()
+            case ScoreType.CLASSIC_O,ScoreType.ANIMAL_O:
+                # different scoring method goes here
+                raise NotImplementedError()
+        
+        raise ValueError(f"I don't know how to score {self.score_type}")
+
 
     @cached_property
     def missed_checkpoints(self) -> list[int]:
@@ -75,8 +104,6 @@ class Grade:
         # find missed checkpoints
         raise NotImplementedError
         
-        # find missed checkpoints
-
         # buffer_string = ""
         # bufferBool = True
         # unsorted = True
@@ -131,5 +158,4 @@ ANIMAL_MAPPING = {
     'Crab': 39,
 }
 
-# This isnt real lol
 CURRENT_COURSE = COURSES[9] # Crab
