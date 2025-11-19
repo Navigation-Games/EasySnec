@@ -13,6 +13,7 @@ dependencies = [
     "sportident>=1.2.8",
     "fastlog",
     "pyxdameraulevenshtein>=1.9.0",
+    "pydantic>=2.12.3",
 ]
 [project.scripts]
 easysnec = "easysnec.app:main"
@@ -23,7 +24,6 @@ easysnec = "easysnec.app:main"
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
-    "pydantic>=2.12.3",
     "pyapp>=4.16.1",
     "typeguard>=4.4.4",
     "pytest-cov>=7.0.0",
