@@ -1,10 +1,11 @@
 import json
 import pprint
 import sys
+import signal
 
 from fastlog import log
 from pathlib import Path
-from sportident import SIReaderReadout, SIReaderCardChanged
+from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 from time import strftime, localtime
 
 from PySide6.QtQuick import QQuickView
@@ -13,38 +14,53 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
 from .utils.grading import COURSES, InputData, Grade, ScoreType
+import time
 
 
 class ReaderThread(QThread):
     def __init__(self, engine):
         super().__init__()
         self.engine = engine
+        
+
+    def get_reader(self):
+        # TODO: retry
+        # TODO: do not recreate each loop. cache once
+        for _ in range(10):
+            try:
+                reader_port = 'COM5'
+                self.si = SIReaderReadout(reader_port)
+
+                log.success(f'connected to SI at port {reader_port}')
+                return
+
+            except:
+                time.sleep(1)
+        raise RuntimeError("Could not open SI reader")
+
 
     def run(self):
-        log.success("running now")
+        self.get_reader()
+        
+        log.info("starting si loop...")
         while True:
-            log.info("polling now in loop")
+            log.info("starting instance of si loop...")
             # TODO: make port an argument or pull from the ui someplace
-            reader_port = '/dev/cu.SLAB_USBtoUART'
-
+            # reader_port = '/dev/cu.SLAB_USBtoUART'
 
             try:
-                # TODO: retry
-                # TODO: do not recreate each loop. cache once
-                si = SIReaderReadout(reader_port)
-
                 # wait for poll
-                while not si.poll_sicard():
+                while not self.si.poll_sicard():
                     pass
 
                 # process output
-                input_data = InputData.from_si_result(si.read_sicard())
-            except SIReaderCardChanged:
+                input_data = InputData.from_si_result(self.si.read_sicard())
+            except (SIReaderCardChanged, SIReaderException) as e:
                 # this exception (card removed too early) can be ignored 
-                pass
+                log.warning(f'exception: {e}')
 
             # beep
-            si.ack_sicard()
+            self.si.ack_sicard()
             
             # grade response
             # runner_correct = get_correctness_of_course(card_data, CURRENT_COURSE.stations)
@@ -55,7 +71,7 @@ class ReaderThread(QThread):
             runner_correct = input_data.score_against(best_guess_course)
 
             # Grade(input_data, best_guess_course, ScoreType.ANIMAL_O).score
-            log.debug("Correctness: " + pprint.pformat(runner_correct))
+            log.info("Correctness: " + pprint.pformat(runner_correct))
             
             # Put stuff in the UI
             if runner_correct:
@@ -89,9 +105,15 @@ def main() -> None:
     
     reader_thread = ReaderThread(engine)
     reader_thread.start()
+    # TODO: if this thread crashes, it should stop the program!!!
 
+    # wire up control c
+    signal.signal(signal.SIGINT, lambda x,y: app.quit())
+    
+    
     # execute and cleanup
     app.exec()
+
 
 if __name__ == '__main__':
     main()
