@@ -8,9 +8,9 @@ from pathlib import Path
 from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 from time import strftime, localtime
 
-from PySide6.QtQuick import QQuickView
+# from PySide6.QtQuick import QQuickView
 from PySide6.QtCore import QStringListModel, QUrl, QTimer, QThread
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 
 from .utils.grading import COURSES, InputData, Grade, ScoreType
@@ -88,8 +88,24 @@ def main() -> None:
     app = QGuiApplication(sys.argv)
 
     engine = QQmlApplicationEngine()
+
+    # TODO: This is prob how we embed files in the application
+    # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/qrcfiles.html
     engine.load('./src/easysnec/qml/Main.qml')
+    
+    # wire up qt to kill python and vice versa
     engine.quit.connect(app.quit)
+    signal.signal(signal.SIGINT, lambda x,y: app.quit())
+
+    # window = QMainWindow()
+    # window.setWindowTitle("Codeloop.org")
+ 
+    # icon = QIcon("qt.png")
+    # window.setWindowIcon(icon)
+    # window.setWindowIcon(QIcon("./resources/navigation_games_logo_no_background.png"))
+
+    # engine.rootObjects()[0].setIcon(QIcon("./resources/navigation_games_logo_no_background.png"))
+    app.setWindowIcon(QIcon("./resources/navigation_games_logo_no_background.png"))
 
 
     def update_time():
@@ -106,9 +122,6 @@ def main() -> None:
     reader_thread = ReaderThread(engine)
     reader_thread.start()
     # TODO: if this thread crashes, it should stop the program!!!
-
-    # wire up control c
-    signal.signal(signal.SIGINT, lambda x,y: app.quit())
     
     
     # execute and cleanup

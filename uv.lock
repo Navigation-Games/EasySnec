@@ -127,6 +127,7 @@ version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "fastlog" },
+    { name = "pydantic" },
     { name = "pyserial" },
     { name = "pyside6" },
     { name = "pyxdameraulevenshtein" },
@@ -137,7 +138,6 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pyapp" },
-    { name = "pydantic" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "typeguard" },
@@ -146,6 +146,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastlog" },
+    { name = "pydantic", specifier = ">=2.12.3" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyside6", specifier = ">=6.9.2" },
     { name = "pyxdameraulevenshtein", specifier = ">=1.9.0" },
@@ -156,7 +157,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "pyapp", specifier = ">=4.16.1" },
-    { name = "pydantic", specifier = ">=2.12.3" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "typeguard", specifier = ">=4.4.4" },
