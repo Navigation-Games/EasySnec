@@ -9,7 +9,7 @@ from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 from time import strftime, localtime
 
 # from PySide6.QtQuick import QQuickView
-from PySide6.QtCore import QStringListModel, QUrl, QTimer, QThread
+from PySide6.QtCore import QStringListModel, QUrl, QTimer, QThread, Slot, QObject
 from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 
@@ -80,6 +80,12 @@ class ReaderThread(QThread):
                 self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-bad.png')
 
 
+# https://wiki.qt.io/Qt_for_Python/Connecting_QML_Signals
+class Console(QObject):
+    @Slot(str)
+    def outputStr(self, s):
+        print(s)
+
 def main() -> None:
     # my_model = QStringListModel()
     # my_model.setStringList(data_list)
@@ -92,6 +98,11 @@ def main() -> None:
     # TODO: This is prob how we embed files in the application
     # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/qrcfiles.html
     engine.load('./src/easysnec/qml/Main.qml')
+
+    con = Console()
+    context = engine.rootContext()
+    context.setContextProperty('cont_2', con)
+    engine.rootObjects()[0].setProperty('con', con)
     
     # wire up qt to kill python and vice versa
     engine.quit.connect(app.quit)

@@ -11,6 +11,9 @@ import QtQuick.Controls
 // https://doc.qt.io/qt-6/qtcore-qmlmodule.html
 // https://doc.qt.io/qt-6/qtqmlmodels-index.html
 
+// https://doc.qt.io/archives/qt-5.15/qtquickcontrols2-customize.html#customizing-button
+
+
 ApplicationWindow {
     id: root
     title: "EasySnec"
@@ -25,12 +28,12 @@ ApplicationWindow {
     property var currTime: '1'
 
     // all available ports (possibly filtered)
-    property var portOptions: ["first", "second", "third"]
+    property var portOptions: ["select port", "first", "second", "third"]
     // selected port (this is outgoing)
     property var currPort: 'test'
 
     property bool connected: false
-    property bool show_start_page: false
+    property bool show_start_page: true
 
     // RESULTS
     property bool result_status: false
@@ -38,6 +41,9 @@ ApplicationWindow {
 
     property var image_path: "./resources/glassy-smiley-late.png"
 
+    property bool ready: false
+
+    property var con
     // ------- Program State!
 
     visible: true
@@ -80,9 +86,15 @@ ApplicationWindow {
 
             RowLayout {
                 id: buttons_group
+                // Button {
+                //     text: "open file"
+                //     // onClicked: root.setIcon('./resources/navigation_games_logo_no_background.png')
+                // }
                 Button {
-                    text: "open file"
-                    // onClicked: root.setIcon('./resources/navigation_games_logo_no_background.png')
+                    text: "settings / back to configuration"
+                    onClicked: {
+                        root.show_start_page = true;
+                    }
                 }
             }
 
@@ -119,78 +131,20 @@ ApplicationWindow {
         }
     }
 
-    footer: Rectangle {
-        // background
-        // anchors.fill: parent
-        width: parent.fillWidth
-        height: childrenRect.height;
-        color: root.neutral_grey
-        
-        RowLayout {
-            // contents
-            // spacing: 50
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.leftMargin: 10
-            anchors.rightMargin: 10
-
-            height: 50 //TODO: this should be implicit
-            // anchors.topMargin: 10
-            // anchors.bottomMargin: 10
-            RowLayout {
-
-                Label {
-                    text: "Scoring Mode:"
-                }
-                ComboBox {
-                    model: ["Score-O", "Animal-O"]
-                }
-            }
-
-            RowLayout {
-                id: usb_control_group
-                Layout.alignment: Qt.AlignRight
-
-                Label {
-                    text: "Port Select: "
-                }
-                ComboBox {
-                    // model: ["first", "second", "third"]
-                    model: root.portOptions
-                }
-
-                Button {
-                    text: "Connect"
-                }
-
-                Rectangle {
-                    width: 15
-                    height: width
-
-                    color: root.connected ? root.success_green : root.bad_red
-                    radius: width/2
-                }
-
-            }
-        }
-
-    }
-
     StackLayout {
 
         anchors.fill: parent
         currentIndex: root.show_start_page ? 0:1
 
 
-        Pane {
+        Pane { // setup pane
             id: setup_pane
             ColumnLayout {
                 anchors.fill: parent
 
                 Label {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    text: root.connected ? "You're connected" : "Connect reader to get started"
+                    text: root.connected ? "You're connected. Press START to begin" : "Connect reader and select port to get started"
 
                     color: "#5D5D5D"
                     font.pointSize: 17
@@ -199,10 +153,68 @@ ApplicationWindow {
                     renderType: Text.NativeRendering
                     horizontalAlignment: Text.AlignHCenter
                 }
+
+                ColumnLayout {
+                    Label {
+                        text: "Active Courses:"
+                    }
+                    ListView {
+                        // anchors.fill: parent
+                        width: 180; height: 200
+                        model: ListModel{
+                            ListElement {t:"Course 1"}
+                            ListElement {t:"Course 2"}
+                            ListElement {t:"Course 3"}
+                            ListElement {t:"Course 4"}
+                        }
+
+                        delegate: CheckBox {
+                            checked: true
+                            text: t
+                        }
+                    }
+
+                    Button {
+                        text: "Add Courses"
+                        onClicked: {
+                            cont_2.outputStr("Hello, world!")
+                        }
+                    }
+                }
+
+                RowLayout {
+                    RowLayout {
+                        Label {
+                            text: "Scoring Mode:"
+                        }
+                        ComboBox {
+                            model: ["Score-O", "Animal-O"]
+                        }
+                    }
+
+                    ComboBox {
+                        model: root.portOptions
+                        background: Rectangle {
+                            color: root.connected ? '#65c15a':'#a83434'
+                        }
+                    }
+
+                    Button {
+                        text: "Start"
+                        // background: Rectangle {
+                        //     color: root.ready ? '#65c15a':'#7b7b7b'
+                        // }
+                        onClicked: {
+                            root.show_start_page = false;
+                        }
+
+                        // enabled: root.connected
+                    }
+                }
             }
         }
 
-        Pane {
+        Pane { // feedback pane
             id: feedback_pane
             ColumnLayout {
                 anchors.fill: parent
