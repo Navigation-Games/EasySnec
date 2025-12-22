@@ -27,23 +27,12 @@ ApplicationWindow {
     // debug value
     property var currTime: '1'
 
-    // all available ports (possibly filtered)
-    property var portOptions: ["select port", "first", "second", "third"]
-    // selected port (this is outgoing)
-    property var currPort: 'test'
-
     property bool connected: false
     property bool show_start_page: true
 
     // RESULTS
-    property bool result_status: false
-    property var result_string: "You did it!" 
-
     property var image_path: "./resources/glassy-smiley-late.png"
 
-    property bool ready: false
-
-    property var con
     // ------- Program State!
 
     visible: true
@@ -58,6 +47,8 @@ ApplicationWindow {
     property var bad_red: "#FF9090"
     property var neutral_grey: "#DFDFDF" 
     property var dark_grey: "#B3B3B3" 
+
+
 
     header: Rectangle {
         // background
@@ -119,8 +110,9 @@ ApplicationWindow {
                 
                 Label {
 
-                    color: root.navgames_blue
-                    text: root.currTime
+                    color: root.dark_grey
+                    text: backend.time
+                    // text: root.currTime
                     // font.pointSize: 17
                     font.bold: true
                     font.family: "Arial"
@@ -177,7 +169,8 @@ ApplicationWindow {
                     Button {
                         text: "Add Courses"
                         onClicked: {
-                            cont_2.outputStr("Hello, world!")
+                            backend.log("Hello world. application name is " + backend.name)
+                            // backend.log(backend.name)
                         }
                     }
                 }
@@ -193,7 +186,8 @@ ApplicationWindow {
                     }
 
                     ComboBox {
-                        model: root.portOptions
+                        textRole: "display"
+                        model: backend.ports
                         background: Rectangle {
                             color: root.connected ? '#65c15a':'#a83434'
                         }
