@@ -193,5 +193,9 @@ class Backend:
                 # Put stuff in the UI
                 if runner_correct:
                     self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-good-green.png')
+                    self.engine.rootObjects()[0].setProperty('scoring_output', "")
+                    self.engine.rootObjects()[0].setProperty('runner_input', "")
                 else:
                     self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-bad.png')
+                    self.engine.rootObjects()[0].setProperty('scoring_output', "Correct course: " + ", ".join(best_guess_course.stations))
+                    self.engine.rootObjects()[0].setProperty('runner_input', "Your attempt: " + ", ".join(input_data.stations))

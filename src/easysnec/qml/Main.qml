@@ -32,8 +32,8 @@ ApplicationWindow {
 
     // RESULTS
     property var image_path: "./resources/glassy-smiley-late.png"
-    property var scoring_output: "ERROR: Scoring results not found"
-    property var runner_input: "ERROR: Runner input not found"
+    property var scoring_output: ""
+    property var runner_input: ""
 
     // ------- Program State!
 
@@ -215,8 +215,8 @@ ApplicationWindow {
                 Label {
                     Layout.alignment: Qt.AlignHCenter
 
-                    color: "#0090f8"
-                    text: "Correct course: " + root.scoring_output
+                    color: "#189d16ff"
+                    text: root.scoring_output
                     font.pointSize: 17
                     font.bold: true
                     font.family: "Arial"
@@ -233,7 +233,7 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter
 
                     color: "#0090f8"
-                    text: "Your attempt: " + root.runner_input
+                    text: root.runner_input
                     font.pointSize: 17
                     font.bold: true
                     font.family: "Arial"
