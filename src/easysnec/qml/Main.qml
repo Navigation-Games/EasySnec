@@ -171,9 +171,9 @@ ApplicationWindow {
                     ComboBox {
                         textRole: "display"
                         model: backend.ports
-                        background: Rectangle {
-                            color: root.connected ? '#65c15a':'#a83434'
-                        }
+                        // background: Rectangle {
+                        //     color: root.connected ? '#65c15a':'#a83434'
+                        // }
                     }
 
                     Button {

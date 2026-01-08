@@ -1,6 +1,7 @@
 from sqlite3.dbapi2 import InterfaceError
 import pprint
 import time
+import serial.tools.list_ports
 
 from fastlog import log
 from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
@@ -23,7 +24,7 @@ class BackendInterface(QObject):
     # https://wiki.qt.io/Qt_for_Python/Connecting_QML_Signals
 
     # properties
-    _ports = QStringListModel(['p1','p2','p3'])
+    _ports = QStringListModel([port.device for port in serial.tools.list_ports.comports()])
 
     
 
@@ -60,6 +61,7 @@ class BackendInterface(QObject):
 
     # --- ports property (r)
     def get_ports(self):
+        #TODO: refresh ports list occasionally
         return self._ports
     portsChanged = Signal(QObject)
     ports = Property(QObject, get_ports, notify=portsChanged) # ty: ignore[invalid-argument-type]
