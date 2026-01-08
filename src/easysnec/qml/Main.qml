@@ -33,7 +33,7 @@ ApplicationWindow {
     // RESULTS
     property var image_path: "./resources/glassy-smiley-late.png"
     property var scoring_output: ""
-    property var runner_input: ""
+    property var feedback_message: ""
 
     // ------- Program State!
 
@@ -215,7 +215,7 @@ ApplicationWindow {
                 Label {
                     Layout.alignment: Qt.AlignHCenter
 
-                    color: "#189d16ff"
+                    color: "#0090f8"
                     text: root.scoring_output
                     font.pointSize: 17
                     font.bold: true
@@ -233,7 +233,7 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter
 
                     color: "#0090f8"
-                    text: root.runner_input
+                    text: root.feedback_message
                     font.pointSize: 17
                     font.bold: true
                     font.family: "Arial"

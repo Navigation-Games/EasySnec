@@ -194,8 +194,17 @@ class Backend:
                 if runner_correct:
                     self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-good-green.png')
                     self.engine.rootObjects()[0].setProperty('scoring_output', "")
-                    self.engine.rootObjects()[0].setProperty('runner_input', "")
+                    self.engine.rootObjects()[0].setProperty('feedback_message', "")
                 else:
+                    # if incorrect, ready the scoring output and feedback messages
+                    missing_checkpoints = [station for station in best_guess_course.stations if station not in input_data.stations]
+                    extra_checkpoints = [station for station in input_data.stations if station not in best_guess_course.stations]
+
+                    scoring_output = ""
+                    if missing_checkpoints:
+                        scoring_output += "Missing checkpoints: " + ", ".join(missing_checkpoints) + "\n"
+                    if extra_checkpoints:
+                        scoring_output += "Extra checkpoints: " + ", ".join(extra_checkpoints)
                     self.engine.rootObjects()[0].setProperty('image_path', './resources/glassy-smiley-bad.png')
-                    self.engine.rootObjects()[0].setProperty('scoring_output', "Correct course: " + ", ".join(best_guess_course.stations))
-                    self.engine.rootObjects()[0].setProperty('runner_input', "Your attempt: " + ", ".join(input_data.stations))
+                    self.engine.rootObjects()[0].setProperty('scoring_output', scoring_output)
+                    self.engine.rootObjects()[0].setProperty('feedback_message', "Try again!")
