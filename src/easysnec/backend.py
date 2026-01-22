@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+from hashlib import new
 from sqlite3.dbapi2 import InterfaceError
 import pprint
 import time
@@ -6,10 +9,11 @@ import serial.tools.list_ports
 from fastlog import log
 from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 
-from PySide6.QtCore import QStringListModel, QTimer, QThread, QObject, Signal,Slot,Property,PyClassProperty, QTimerEvent
+from PySide6.QtCore import QStringListModel, QTimer, QThread, QObject, QEnum, Signal,Slot,Property,PyClassProperty, QTimerEvent
 
 from .utils.grading import COURSES, InputData, Grade
 
+from enum import Enum
 from functools import partial
 
 # from warnings import DeprecationWarning
@@ -17,20 +21,31 @@ from functools import partial
 class BackendInterfacePython:
     pass
 
+class DummyClass(QObject):
+    @QEnum
+    class BackendScoreType(Enum):
+        SCORE_O = 1
+        CLASSIC_O = 2
+        ANIMAL_O = 3
+
 class BackendInterface(QObject):
     # this object should contain all program state
 
     # https://www.qt.io/product/qt6/qml-book/ch19-python-build-app
     # https://wiki.qt.io/Qt_for_Python/Connecting_QML_Signals
 
-    # properties
-    _ports = QStringListModel([port.device for port in serial.tools.list_ports.comports()])
-
-    
+    @QEnum
+    class BackendScoreType(Enum):
+        SCORE_O = 1
+        CLASSIC_O = 2
+        ANIMAL_O = 3
 
     # --- signals
     @Signal
     def backend_started(self): pass
+
+    @Signal
+    def score_scored(self, str): pass
     
     # --- logging slot
     @Slot(str)
@@ -38,7 +53,19 @@ class BackendInterface(QObject):
         log.info(string)
 
     # ------------ QT properties
-    # --- name property (r)
+    # --- time property (rw) (this is our canary property)
+    _time = "the time is now"
+    def get_time(self):
+        return self._time
+    def set_time(self, new_time):
+        if self._time != new_time:
+            self._time = new_time
+            self.timeChanged.emit(new_time)
+    timeChanged = Signal(str)
+    time = Property(str, get_time, set_time, notify=timeChanged) # ty: ignore[invalid-argument-type]
+    
+
+    # --- name property (rw)
     _name = 'name'
     def get_name(self):
         return self._name
@@ -46,48 +73,70 @@ class BackendInterface(QObject):
         if self._name != new_name:
             self._name = new_name
             self.nameChanged.emit(new_name)
-
     nameChanged = Signal(str)
     name = Property(str, get_name, set_name, notify=nameChanged) # ty: ignore[invalid-argument-type]
 
-    # --- test_property
-    @Property(str)
-    def test_value(self):
-        return "this is a test value"
-    @test_value.setter
-    def set_test_value(self, new_test_value):
-        log.warning('nice it worked')
-
 
     # --- ports property (rw)
-    portsChanged = Signal(QObject)
-    def set_ports(self, new_ports):
-        self._ports = new_ports
-        self.portsChanged.emit(new_ports)
+    _ports = QStringListModel([port.device for port in serial.tools.list_ports.comports()])
     def get_ports(self):
         return self._ports
-    ports = Property(QObject, get_ports, notify=portsChanged) # ty: ignore[invalid-argument-type]
-    # --- time property (rw)
-    _time = "the time is now"
-    timeChanged = Signal(str)
-    def set_time(self, new_time):
-        self._time = new_time
-        self.timeChanged.emit(new_time)
-    def get_time(self):
-        return self._time
-    time = Property(str, get_time, set_time, notify=timeChanged) # ty: ignore[invalid-argument-type]
-    # @Property(str)
-    # def time(self):
-    #     return self._time
-    # @time.setter
-    # def set_time(self, new_time):
-    #     self._time = new_time
-    #     self.timeChanged.emit(new_time)
+    def set_ports(self, new_ports):
+        if self._ports != new_ports:
+            self._ports = new_ports
+            self.portsChanged.emit(new_ports)
+    portsChanged = Signal(QObject)
+    ports = Property(QObject, get_ports, set_ports, notify=portsChanged) # ty: ignore[invalid-argument-type]
 
-    
 
     # --- selected port property (rw)
-    # --- port selected slot
+    _selected_port = ""
+    def get_selected_port(self):
+        return self._selected_port
+    def set_selected_port(self, new_selected_port):
+        if self._selected_port != new_selected_port:
+            self._selected_port = new_selected_port
+            self.selectedPortChanged.emit(new_selected_port)
+    selectedPortChanged = Signal(str)
+    selectedPort = Property(str, get_selected_port, set_selected_port, notify=selectedPortChanged)  # ty: ignore[invalid-argument-type]
+
+    
+    # --- scoring mode property (rw)
+    _scoring_mode = None
+    def get_scoring_mode(self):
+        return self._scoring_mode
+    def set_scoring_mode(self, new_scoring_mode):
+        if self._scoring_mode != new_scoring_mode:
+            self._scoring_mode = new_scoring_mode
+            self.scoringModeChanged.emit(new_scoring_mode)
+    scoringModeChanged = Signal(str)
+    scoringMode = Property(DummyClass.BackendScoreType, get_scoring_mode, set_scoring_mode, notify=scoringModeChanged)  # ty: ignore[invalid-argument-type]
+
+    # --- course set property (rw)
+    _course_set = ""
+    def get_course_set(self):
+        return self._course_set
+    def set_course_set(self, new_course_set):
+        if self._course_set != new_course_set:
+            self._course_set = new_course_set
+            self.courseSetChanged.emit(new_course_set)
+    courseSetChanged = Signal(str)
+    courseSet = Property(str, get_course_set, set_course_set, notify=courseSetChanged)  # ty: ignore[invalid-argument-type]
+
+
+    # --- app_running property (rw)
+    _running = False
+    def get_running(self):
+        return self._running
+    def set_running(self, new_running):
+        if self._running != new_running:
+            self._running = new_running
+            self.runningChanged.emit(new_running)
+    runningChanged = Signal(str)
+    running = Property(bool, get_running, set_running, notify=runningChanged)  # ty: ignore[invalid-argument-type]
+    
+
+
 
 
 
