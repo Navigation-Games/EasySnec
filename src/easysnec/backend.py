@@ -241,7 +241,7 @@ class Backend:
                 
                 # when multiple courses are available, get_closest_course before grading
                 best_guess_course = input_data.get_closest_course(COURSES)
-                runner_grade = input_data.score_against(best_guess_course)
+                runner_grade = input_data.score_against(best_guess_course, BackendInterface.scoringMode)
 
                 log.info("Correctness: " + pprint.pformat(runner_grade.status))
                 
