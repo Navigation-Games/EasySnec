@@ -203,10 +203,10 @@ class Backend:
 
         def get_reader(self):
             # TODO: retry
-            # TODO: do not recreate each loop. cache once
+            # TODO: do not recreate each loop. cache once 
             for _ in range(10):
                 try:
-                    reader_port = 'COM5'
+                    reader_port = BackendInterface.selectedPort
                     self.si = SIReaderReadout(reader_port)
 
                     log.success(f'connected to SI at port {reader_port}')
