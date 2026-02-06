@@ -1,0 +1,32 @@
+name: PR Checks
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+    lint:
+      name: Run Linting
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+        - name: Setup Python
+          uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+
+        - name: Run ruff
+          run: uv tool run ruff check
+
+    pytest:
+      name: Run pytest
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+        - name: Setup Python
+          uses: astral-sh/setup-uv@803947b9bd8e9f986429fa0c5a41c367cd732b41 # v7.2.1
+
+        - name: Run pytest
+          run: uv run --frozen pytest
+    
