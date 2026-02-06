@@ -1,17 +1,15 @@
 from __future__ import annotations
+from easysnec.utils.grading import OutputData, SuccessStatus, Course, InputData
 
 import datetime as dt
 import pytest
 import uuid
 import typeguard
 
-# this will add type checking to all functions we declare. Ideally this would go in pyproject.toml, however 
+# this will add type checking to all functions we declare. Ideally this would go in pyproject.toml, however
 # then the following imports would slip through, as pytest runs the conftest first
 typeguard.install_import_hook("easysnec")
 
-from easysnec.utils.grading import Course
-from easysnec.utils.grading import InputData
-from easysnec.utils.grading import OutputData, SuccessStatus
 
 @pytest.fixture
 def example_course() -> Course:
@@ -36,7 +34,7 @@ def example_input_success(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # "202503140930170000000123",
     )
 
@@ -64,7 +62,7 @@ def example_input_incomplete(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
 
@@ -91,23 +89,26 @@ def example_input_misses() -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
+
+
 @pytest.fixture
 def example_input_no_start() -> InputData:
     return InputData(
         card_id=123,
-        start_time = None,
-        finish_time= dt.datetime(2025, 3, 14, 10, 22, 47),
-        punches = [
+        start_time=None,
+        finish_time=dt.datetime(2025, 3, 14, 10, 22, 47),
+        punches=[
             (42, dt.datetime(2025, 3, 14, 9, 37, 2)),
             (43, dt.datetime(2025, 3, 14, 9, 57, 8)),
             (49, dt.datetime(2025, 3, 14, 10, 9, 44)),
         ],
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
+
 
 @pytest.fixture
 def example_input_no_finish() -> InputData:
@@ -120,7 +121,7 @@ def example_input_no_finish() -> InputData:
             (43, dt.datetime(2025, 3, 14, 9, 57, 8)),
             (49, dt.datetime(2025, 3, 14, 10, 9, 44)),
         ],
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
 
@@ -148,7 +149,7 @@ def example_input_wrong_order(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
 
@@ -176,7 +177,7 @@ def example_input_not_started(example_course: Course) -> InputData:
         start_time=start,
         finish_time=finish,
         punches=punches,
-        reading_id=uuid.uuid4()
+        reading_id=uuid.uuid4(),
         # reading_id="202503140930170000000123",
     )
 
