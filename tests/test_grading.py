@@ -49,48 +49,19 @@ def test_get_closest_course():
         Course("Crab", False, [39, 31, 32, 35, 37]),
     ]
 
-    crab_course = COURSES[9]
+    def assert_helper(list):
+        return (
+            generate_input_from_station_list(list).get_closest_course(COURSES)
+            == COURSES[9]
+        )
 
-    assert (
-        generate_input_from_station_list([39, 31, 32, 35, 37]).get_closest_course(
-            COURSES
-        )
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list([39, 31, 32, 35, 36]).get_closest_course(
-            COURSES
-        )
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list([39, 31, 2001, 35, 37]).get_closest_course(
-            COURSES
-        )
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list([39, 32, 35, 37]).get_closest_course(COURSES)
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list([39, 31, 32, 35, 37]).get_closest_course(
-            COURSES
-        )
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list([38, 31, 32, 36, 37]).get_closest_course(
-            COURSES
-        )
-        == crab_course
-    )
-    assert (
-        generate_input_from_station_list(
-            [40, 36, 34, 31, 32, 33, 35, 37, 38, 39]
-        ).get_closest_course(COURSES)
-        != crab_course
-    )
+    assert assert_helper([39, 31, 32, 35, 37])
+    assert assert_helper([39, 31, 32, 35, 36])
+    assert assert_helper([39, 31, 2001, 35, 37])
+    assert assert_helper([39, 32, 35, 37])
+    assert assert_helper([39, 31, 32, 35, 37])
+    assert assert_helper([38, 31, 32, 36, 37])
+    assert not assert_helper([40, 36, 34, 31, 32, 33, 35, 37, 38, 39])
 
 
 @pytest.mark.xfail
