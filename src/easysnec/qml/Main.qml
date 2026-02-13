@@ -153,12 +153,18 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignBottom
 
                     ComboBox {
+                        id:port_selector
                         textRole: "display"
                         model: backend.ports
+                        // currentText: backend.selectedPort
                         // background: Rectangle {
                         //     color: root.connected ? '#65c15a':'#a83434'
                         // }
+                        // onAccepted: {
+                        //     backend.selectedPort = currentText
+                        // }
                     }
+                    Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
 
                     RowLayout {
                         Label {
@@ -185,6 +191,7 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
+                            backend.ping_port();
                         }
 
                         // enabled: root.connected
