@@ -6,12 +6,12 @@ import pprint
 import time
 import serial.tools.list_ports
 
-from fastlog import log
+# from fastlog import log
 from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 
 from PySide6.QtCore import QStringListModel, QTimer, QThread, QObject, QEnum, Signal,Slot,Property,PyClassProperty, QTimerEvent
 
-from .utils.grading import COURSES, InputData, Grade
+from easysnec.utils.grading import COURSES, InputData, Grade, ScoreType, EMOJI_MAPPING
 
 from enum import Enum
 from functools import partial
@@ -50,7 +50,8 @@ class BackendInterface(QObject):
     # --- logging slot
     @Slot(str)
     def log(self, string:str):
-        log.info(string)
+        # log.info(string)
+        pass
 
     # ------------ QT properties
     # --- time property (rw) (this is our canary property)
@@ -186,10 +187,10 @@ class Backend:
     def shutdown(self):
         self.reader.terminate()
         self.timer.stop()
-        log.success('threads safely stopped')
+        # log.success('threads safely stopped')
 
     def big_test(self, engine=None):
-        log.info('testing now!!')
+        # log.info('testing now!!')
         pass
 
 
@@ -199,7 +200,7 @@ class Backend:
             super().__init__()
             self.engine = engine
 
-            log.info('reader worker created')
+            # log.info('reader worker created')
 
         def get_reader(self):
             # TODO: retry
@@ -209,7 +210,7 @@ class Backend:
                     reader_port = BackendInterface.selectedPort
                     self.si = SIReaderReadout(reader_port)
 
-                    log.success(f'connected to SI at port {reader_port}')
+                    # log.success(f'connected to SI at port {reader_port}')
                     return
 
                 except:
@@ -217,11 +218,11 @@ class Backend:
             raise RuntimeError("Could not open SI reader")
 
         def spin_thread(self):
-            log.info("starting si loop...")
+            # log.info("starting si loop...")
             self.get_reader()
             
             while True:
-                log.info("starting instance of si loop...")
+                # log.info("starting instance of si loop...")
                 # TODO: make port an argument or pull from the ui someplace
                 # reader_port = '/dev/cu.SLAB_USBtoUART'
 
@@ -234,8 +235,8 @@ class Backend:
                     input_data = InputData.from_si_result(self.si.read_sicard())
                 except (SIReaderCardChanged, SIReaderException) as e:
                     # this exception (card removed too early) can be ignored 
-                    log.warning(f'exception: {e}')
-
+                    # log.warning(f'exception: {e}')
+                    pass
                 # beep
                 self.si.ack_sicard()
                 
@@ -243,7 +244,8 @@ class Backend:
                 best_guess_course = input_data.get_closest_course(COURSES)
                 runner_grade = input_data.score_against(best_guess_course, BackendInterface.scoringMode)
 
-                log.info("Correctness: " + pprint.pformat(runner_grade.status))
+                # Grade(input_data, best_guess_course, ScoreType.ANIMAL_O).score
+                # log.info("Correctness: " + pprint.pformat(runner_correct))
                 
                 # Put stuff in the UI
                 if runner_grade.status == SuccessStatus.SUCCESS:

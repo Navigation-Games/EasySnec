@@ -11,13 +11,13 @@ dependencies = [
     "pyside6>=6.9.2",
     "sireader>=1.1.3",
     "sportident>=1.2.8",
-    "fastlog",
+    # "fastlog",
     "pyxdameraulevenshtein>=1.9.0",
     "pydantic>=2.12.3",
+    "pyinstaller>=6.18.0",
 ]
 [project.scripts]
 easysnec = "easysnec.app:main"
-
 
 
 # ------------- TEST
@@ -29,12 +29,7 @@ dev = [
     "pytest-cov>=7.0.0",
 ]
 [tool.pytest.ini_options]
-addopts = [
-    "-ra",
-    "-q",
-    "--import-mode=importlib",
-    "--cov=easysnec",
-]
+addopts = ["-ra", "-q", "--import-mode=importlib", "--cov=easysnec"]
 # typeguard-packages = """
 #     easysnec
 # """
@@ -62,7 +57,7 @@ PYAPP_PYTHON_VERSION = "3.11"
 [tool.hatch.envs.build.scripts]
 # run with `uvx hatch run build:binary
 binary = [
-#  "hatch build -c -t sdist",
-#  "mv {root}/dist/easysnec-*.tar.gz {root}/dist/easysnec.tar.gz",
- "hatch build -t binary"
+    #  "hatch build -c -t sdist",
+    #  "mv {root}/dist/easysnec-*.tar.gz {root}/dist/easysnec.tar.gz",
+    "hatch build -t binary",
 ]

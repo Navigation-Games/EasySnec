@@ -7,13 +7,13 @@ import signal
 import time
 import random
 
-from fastlog import log
+# from fastlog import log
 from pathlib import Path
 
 from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 
-from .backend import BackendInterface, Backend
+from easysnec.backend import BackendInterface, Backend
 
 
 def main() -> None:
@@ -33,7 +33,7 @@ def main() -> None:
 
     file = Path(__file__).parent / 'qml' / 'Main.qml'
     # '/qml/Main.qml'
-    log.info(f'loading qml from {file}')
+    # log.info(f'loading qml from {file}')
     engine.load(file)
     if not engine.rootObjects():
         raise RuntimeError('QML Failed to load')
@@ -48,6 +48,7 @@ def main() -> None:
     # --- start the app
     app.exec()
 
+main()
 
 if __name__ == '__main__':
     main()
