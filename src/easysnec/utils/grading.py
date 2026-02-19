@@ -24,7 +24,7 @@ class SuccessStatus(Enum):
 class ScoreType(Enum):
     SCORE_O = 1
     CLASSIC_O = 2
-    ANIMAL_O = 2  # Looks exactly like classic-o from our perspective. this might be an illegal use of an enum
+    ANIMAL_O = 3
 
 
 @dataclass(frozen=True)
