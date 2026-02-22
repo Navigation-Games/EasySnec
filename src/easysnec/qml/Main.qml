@@ -156,15 +156,11 @@ ApplicationWindow {
                         id:port_selector
                         textRole: "display"
                         model: backend.ports
-                        // currentText: backend.selectedPort
-                        // background: Rectangle {
-                        //     color: root.connected ? '#65c15a':'#a83434'
-                        // }
-                        // onAccepted: {
-                        //     backend.selectedPort = currentText
-                        // }
                     }
+
+                    // possibly illegal, but it hasnt broken yet!
                     Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
+                    Binding { target: port_selector; property: "currentText"; value: backend.selectedPort }
 
                     RowLayout {
                         Label {
@@ -191,6 +187,7 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
+                            backend.log('hello!@!!');
                             backend.ping_port();
                         }
 
