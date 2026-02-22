@@ -1,7 +1,7 @@
 {
   # Which package repository will we point to?
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -23,24 +23,28 @@
 
             # Use this version of the python package for GUI support (the alternative is Qt Hell)
             packages = with pkgs; [
-              python314Full
-              python314Packages.tkinter
+              python314
+              uv
             ];
 
-            # Auto-source the venv (nice!)
             shellHook = ''
+              # Auto-source the venv
               source .venv/bin/activate
             '';
 
             # Add these libraries to the linker, for numpy to use
-            nativeBuildInputs = [
-              pkgs.pkg-config
-              pkgs.hdf5
-              pkgs.stdenv.cc.cc.lib
-              pkgs.zlib
+            nativeBuildInputs = with pkgs; [
+              stdenv.cc.cc.lib
+              libGL # posibly superseded by hardware.enable
+              libx11
+              glib
+              krb5
+              libxkbcommon
+              dbus
+              wayland
             ];
 
-            LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${pkgs.lib.makeLibraryPath nativeBuildInputs}";
+            LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:/run/opengl-driver/lib/${pkgs.lib.makeLibraryPath nativeBuildInputs}";
         }
       );
     };
