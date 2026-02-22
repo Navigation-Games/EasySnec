@@ -42,13 +42,13 @@ ApplicationWindow {
     height: 480
 
     // colors!
-    property var navgames_blue: "#0090f8" 
-    property var navgames_orange: "#ff683a" 
-    property var success_green: "#9AE99D" 
-    property var info_blue: "#CBD9FF" 
+    property var navgames_blue: "#0090f8"
+    property var navgames_orange: "#ff683a"
+    property var success_green: "#9AE99D"
+    property var info_blue: "#CBD9FF"
     property var bad_red: "#FF9090"
-    property var neutral_grey: "#DFDFDF" 
-    property var dark_grey: "#B3B3B3" 
+    property var neutral_grey: "#DFDFDF"
+    property var dark_grey: "#B3B3B3"
 
 
 
@@ -108,8 +108,8 @@ ApplicationWindow {
 
             RowLayout {
                 Layout.alignment: Qt.AlignRight
-                
-                
+
+
                 Label {
 
                     color: root.dark_grey
@@ -156,16 +156,10 @@ ApplicationWindow {
                         id:port_selector
                         textRole: "display"
                         model: backend.ports
-                        // currentText: backend.selectedPort
-                        // background: Rectangle {
-                        //     color: root.connected ? '#65c15a':'#a83434'
-                        // }
-                        // onAccepted: {
-                        //     backend.selectedPort = currentText
-                        // }
                     }
-                    Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
 
+                    // possibly illegal, but it hasnt broken yet!
+                    Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
                     RowLayout {
                         Label {
                             text: "Scoring Mode:"
@@ -191,6 +185,7 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
+                            backend.log('hello!@!!');
                             backend.ping_port();
                         }
 
@@ -205,7 +200,7 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent
 
-                
+
 
                 Rectangle {
                     Layout.fillWidth: true
