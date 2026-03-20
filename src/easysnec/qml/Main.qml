@@ -221,7 +221,7 @@ ApplicationWindow {
 
                     color: "#0090f8"
                     text: root.scoring_output
-                    font.pointSize: 17
+                    font.pointSize: 40
                     font.bold: true
                     font.family: "Arial"
                     renderType: Text.NativeRendering
@@ -238,7 +238,7 @@ ApplicationWindow {
 
                     color: "#0090f8"
                     text: root.feedback_message
-                    font.pointSize: 17
+                    font.pointSize: 40
                     font.bold: true
                     font.family: "Arial"
                     renderType: Text.NativeRendering

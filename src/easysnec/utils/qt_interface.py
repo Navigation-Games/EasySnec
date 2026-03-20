@@ -1,24 +1,17 @@
+from enum import Enum
 
-
+from fastlog import log
 from PySide6.QtCore import (
     QStringListModel,
-    QTimer,
-    QThread,
     QObject,
     QEnum,
     Signal,
     Slot,
     Property,
 )
+import serial.tools.list_ports
+from .grading import Grade
 
-import serial
-
-from enum import Enum
-from fastlog import log
-
-
-class BackendInterfacePython:
-    pass
 
 
 class DummyClass(QObject):
@@ -42,17 +35,10 @@ class BackendInterface(QObject):
         ANIMAL_O = 3
 
     # --- signals
-    @Signal
-    def backend_started(self):
-        pass
-
-    @Signal
-    def score_scored(self, str):
-        pass
-
-    @Signal
-    def try_connect_to_si_reader(self):
-        pass
+    backend_started = Signal()
+    score_scored = Signal()
+    try_connect_to_si_reader = Signal()
+    card_result_readout = Signal(Grade)
 
     @Slot()
     def ping_port(self):
@@ -103,12 +89,6 @@ class BackendInterface(QObject):
 
     def set_ports(self, new_ports):
         if self._ports.stringList() != new_ports.stringList():
-            log.info(self._ports)
-            log.info(dir(new_ports))
-            log.info(new_ports.stringList())
-
-            quit()
-
             self._ports = new_ports
             self.portsChanged.emit(new_ports)
 
