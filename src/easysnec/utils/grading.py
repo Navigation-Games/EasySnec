@@ -24,7 +24,7 @@ class SuccessStatus(Enum):
 class ScoreType(Enum):
     SCORE_O = 1
     CLASSIC_O = 2
-    ANIMAL_O = 2  # Looks exactly like classic-o from our perspective. this might be an illegal use of an enum
+    ANIMAL_O = 3
 
 
 @dataclass(frozen=True)
@@ -80,6 +80,11 @@ class Grade:
         ):
             return SuccessStatus.INCOMPLETE
         elif self.course.stations == self.input_data.stations:
+            return SuccessStatus.SUCCESS
+        elif (
+            set(self.course.stations) == set(self.input_data.stations)
+            and self.score_type is ScoreType.SCORE_O
+        ):
             return SuccessStatus.SUCCESS
         else:
             return SuccessStatus.MISSES

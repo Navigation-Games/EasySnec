@@ -38,7 +38,6 @@ class Backend:
             self.console_worker.moveToThread(self.console_thread)
             self.backend_interface.backend_started.connect(self.console_worker.console)
 
-
         # TODO: this code should live in QML
         # This should ideally be implemented by changing
         def hack_respond_to_readout(runner_grade):
@@ -61,11 +60,13 @@ class Backend:
             self.engine.rootObjects()[0].setProperty(
                 "scoring_output", runner_grade.scoring_output
             )
+
         self.backend_interface.card_result_readout.connect(hack_respond_to_readout)
 
-
         def get_reader():
-            log.info(f'attempting to connect to port {self.backend_interface._selected_port}')
+            log.info(
+                f"attempting to connect to port {self.backend_interface._selected_port}"
+            )
 
             try:
                 self.reader_worker.si_reader = SIReaderReadout(
@@ -75,7 +76,9 @@ class Backend:
                 self.reader_worker.si_is_ready = True
             except SIReaderException:
                 self.reader_worker.si_is_ready = False
-                raise RuntimeError(f"Could not open SI reader on port {self.backend_interface._selected_port}")
+                raise RuntimeError(
+                    f"Could not open SI reader on port {self.backend_interface._selected_port}"
+                )
 
         self.backend_interface.try_connect_to_si_reader.connect(get_reader)
 
@@ -92,7 +95,9 @@ class Backend:
             if old_port in current_ports:
                 self.backend_interface.set_selected_port(old_port)
             else:
-                log.warning(f'selected port {old_port} has disappeared from list {current_ports}. we must respond to this wisely')
+                log.warning(
+                    f"selected port {old_port} has disappeared from list {current_ports}. we must respond to this wisely"
+                )
 
         self.timer = QTimer(interval=500)  # msecs
         self.timer.timeout.connect(update_time)
@@ -110,15 +115,13 @@ class Backend:
         self.timer.stop()
         log.success("threads safely stopped")
 
-
-    def report_si_input(self, input_data:InputData):
+    def report_si_input(self, input_data: InputData):
         # when multiple courses are available, get_closest_course before grading
         best_guess_course = input_data.get_closest_course(COURSES)
 
         # runner_grade = input_data.score_against(best_guess_course, ScoreType( self.backend.backend_interface.scoringMode))
         runner_grade = input_data.score_against(
-            best_guess_course, ScoreType.ANIMAL_O
-            # best_guess_course, BackendInterface.scoringMode
+            best_guess_course, ScoreType(self.backend_interface._scoring_mode)
         )
 
         log.info("Correctness: " + pprint.pformat(runner_grade.status))
@@ -132,19 +135,20 @@ class DebugConsole(QObject):
         super().__init__()
         self.backend = backend
 
-
     def console(self):
         backend = self.backend
         interface = self.backend.backend_interface
 
         from code import interact
-        interact('DEBUG CONSOLE', local=locals())
+
+        interact("DEBUG CONSOLE", local=locals())
+
 
 class ReaderWorker(QObject):
     def __init__(self, engine, backend):
         super().__init__()
         self.engine = engine
-        self.backend:Backend = backend
+        self.backend: Backend = backend
 
         self.si_is_ready = False
         self.si_reader = None
@@ -168,7 +172,9 @@ class ReaderWorker(QObject):
                     pass
 
                 # process output
-                self.backend.report_si_input(InputData.from_si_result(self.si_reader.read_sicard()))
+                self.backend.report_si_input(
+                    InputData.from_si_result(self.si_reader.read_sicard())
+                )
             except (SIReaderCardChanged, SIReaderException) as e:
                 # this exception (card removed too early) can be ignored
                 log.warning(f"exception: {e}")

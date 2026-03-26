@@ -13,7 +13,6 @@ import serial.tools.list_ports
 from .grading import Grade
 
 
-
 class DummyClass(QObject):
     @QEnum
     class BackendScoreType(Enum):
@@ -115,7 +114,7 @@ class BackendInterface(QObject):
     )
 
     # --- scoring mode property (rw)
-    _scoring_mode = None
+    _scoring_mode = 1
 
     def get_scoring_mode(self):
         return self._scoring_mode
@@ -127,7 +126,7 @@ class BackendInterface(QObject):
 
     scoringModeChanged = Signal(str)
     scoringMode = Property(
-        DummyClass.BackendScoreType,
+        int,
         get_scoring_mode,
         set_scoring_mode,
         notify=scoringModeChanged,  # ty: ignore[invalid-argument-type]
@@ -160,4 +159,3 @@ class BackendInterface(QObject):
 
     runningChanged = Signal(str)
     running = Property(bool, get_running, set_running, notify=runningChanged)  # ty: ignore[invalid-argument-type]
-

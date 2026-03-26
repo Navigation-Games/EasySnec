@@ -17,7 +17,7 @@ import argparse
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('--debug-console', action='store_true')
+    parser.add_argument("--debug-console", action="store_true")
     args = parser.parse_args()
 
     # Set up the application window
@@ -28,7 +28,9 @@ def main() -> None:
     # --- connect backend
     backend_interface = BackendInterface()
     context.setContextProperty("backend", backend_interface)
-    backend = Backend(backend_interface, engine, enable_debug_console=args.debug_console)
+    backend = Backend(
+        backend_interface, engine, enable_debug_console=args.debug_console
+    )
     backend.start()
 
     # TODO: This is prob how we embed files in the application
