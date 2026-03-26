@@ -1,18 +1,22 @@
 from __future__ import annotations
 
-import sys
+import logging
 import signal
-
-from fastlog import log
+import sys
 from pathlib import Path
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-from .backend import BackendInterface, Backend
+from .backend import Backend, BackendInterface
+
+log = logging.getLogger(__name__)
 
 
 def main() -> None:
+    # Configure logging
+    logging.basicConfig(filename="easysnec.log", level=logging.DEBUG)
+
     # Set up the application window
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()

@@ -4,7 +4,9 @@ import pprint
 import time
 import serial.tools.list_ports
 
-from fastlog import log
+import logging
+
+logger = logging.getLogger(__name__)
 from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
 
 from PySide6.QtCore import (
@@ -62,13 +64,13 @@ class BackendInterface(QObject):
 
     @Slot()
     def ping_port(self):
-        log.info("pinging port")
+        logger.info("pinging port")
         self.try_connect_to_si_reader.emit()
 
     # --- logging slot
     @Slot(str)
     def log(self, string: str):
-        log.info(string)
+        logger.info(string)
 
     # ------------ QT properties
     # --- time property (rw) (this is our canary property)
@@ -197,15 +199,15 @@ class Backend:
         self.backend_interface.backend_started.connect(self.reader_worker.spin_thread)
 
         def get_reader():
-            log.info("attempting to get port")
+            logger.info("attempting to get port")
             # TODO: retry
             for _ in range(10):
                 try:
-                    log.info(self.backend_interface._selected_port)
+                    logger.info(self.backend_interface._selected_port)
                     self.reader_worker.si_reader = SIReaderReadout(
                         self.backend_interface._selected_port
                     )
-                    log.success("connected !")
+                    logger.info("connected !")
                     self.reader_worker.si_is_ready = True
                     return
                 except SIReaderException:
@@ -238,7 +240,7 @@ class Backend:
     def shutdown(self):
         self.reader.terminate()
         self.timer.stop()
-        log.success("threads safely stopped")
+        logger.info("threads safely stopped")
 
     # --- nested classes
     class ReaderWorker(QObject):
@@ -250,10 +252,10 @@ class Backend:
             self.si_is_ready = False
             self.si_reader = None
 
-            log.info("reader worker created")
+            logger.info("reader worker created")
 
         def spin_thread(self):
-            log.info("starting si loop...")
+            logger.info("starting si loop...")
 
             while True:
                 if not self.si_is_ready:
