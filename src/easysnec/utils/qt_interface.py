@@ -1,17 +1,19 @@
+import logging
 from enum import Enum
 
-from fastlog import log
+import serial.tools.list_ports
 from PySide6.QtCore import (
-    QStringListModel,
-    QObject,
+    Property,
     QEnum,
+    QObject,
+    QStringListModel,
     Signal,
     Slot,
-    Property,
 )
-import serial.tools.list_ports
+
 from .grading import Grade
 
+log = logging.getLogger(__name__)
 
 
 class DummyClass(QObject):
@@ -160,4 +162,3 @@ class BackendInterface(QObject):
 
     runningChanged = Signal(str)
     running = Property(bool, get_running, set_running, notify=runningChanged)  # ty: ignore[invalid-argument-type]
-

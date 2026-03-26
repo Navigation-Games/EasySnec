@@ -126,7 +126,6 @@ name = "easysnec"
 version = "0.1.1"
 source = { editable = "." }
 dependencies = [
-    { name = "fastlog" },
     { name = "pydantic" },
     { name = "pyserial" },
     { name = "pyside6" },
@@ -145,7 +144,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fastlog" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyside6", specifier = ">=6.9.2" },
@@ -160,18 +158,6 @@ dev = [
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "typeguard", specifier = ">=4.4.4" },
-]
-
-[[package]]
-name = "fastlog"
-version = "1.0.0b3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/25/e1/568bef9cdcc39a83028ab0108de036d139d06e529e75f12aebf591266d09/fastlog-1.0.0b3.tar.gz", hash = "sha256:5c0032fcad143adfe4cfbf38b38cf9e63c82966d226aa6c1bf5d6c5e6144c1cf", size = 15519, upload-time = "2020-04-28T19:39:20.272Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/62/07d69ddfcd609e4f5ab128f18a6f87b4180e7fa96b6627d17225fb694954/fastlog-1.0.0b3-py2.py3-none-any.whl", hash = "sha256:9c9edba27943dc9af4c6a286e22426fd069b4fc08e136b15ddb344d3935be44f", size = 13535, upload-time = "2020-04-28T19:39:19.147Z" },
 ]
 
 [[package]]
