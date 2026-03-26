@@ -171,8 +171,21 @@ ApplicationWindow {
                             text: "Scoring Mode:"
                         }
                         ComboBox {
-                            model: ["Score-O", "Animal-O"]
+                            id: scoring_mode_selector
+                            model: [
+                                { value: 1, text: "Score-O"},
+                                { value: 2, text: "Classic-O"},
+                                { value: 3, text: "Animal-O"},
+                            ]
+                            textRole: "text"
+                            valueRole: "value"
+                            onActivated: {
+                                backend.log("selected scoring mode: " + scoring_mode_selector.currentText + " " + scoring_mode_selector.currentValue)
+                                backend.scoringMode = scoring_mode_selector.currentValue
+                            }
                         }
+                        Binding { target: backend; property: "scoringMode"; value: scoring_mode_selector.currentValue }
+
                     }
                     RowLayout {
                         Label {
