@@ -18,7 +18,7 @@ from PySide6.QtCore import (
     Property,
 )
 
-from .utils.grading import COURSES, InputData, SuccessStatus, ScoreType
+from .utils.grading import COURSES, InputData, SuccessStatus
 
 from enum import Enum
 
@@ -135,7 +135,7 @@ class BackendInterface(QObject):
     )
 
     # --- scoring mode property (rw)
-    _scoring_mode = 1
+    _scoring_mode = None
 
     def get_scoring_mode(self):
         return self._scoring_mode
@@ -147,7 +147,7 @@ class BackendInterface(QObject):
 
     scoringModeChanged = Signal(str)
     scoringMode = Property(
-        int,
+        DummyClass.BackendScoreType,
         get_scoring_mode,
         set_scoring_mode,
         notify=scoringModeChanged,  # ty: ignore[invalid-argument-type]
@@ -281,7 +281,7 @@ class Backend:
                 best_guess_course = input_data.get_closest_course(COURSES)
                 # runner_grade = input_data.score_against(best_guess_course, ScoreType( self.backend.backend_interface.scoringMode))
                 runner_grade = input_data.score_against(
-                    best_guess_course, ScoreType(BackendInterface.scoringMode)
+                    best_guess_course, BackendInterface.scoringMode
                 )
 
                 log.info("Correctness: " + pprint.pformat(runner_grade.status))
