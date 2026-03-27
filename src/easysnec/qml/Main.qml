@@ -41,6 +41,9 @@ ApplicationWindow {
     width: 640
     height: 480
 
+    minimumHeight: 400
+    minimumWidth: setup_pane.implicitWidth
+
     // colors!
     property var navgames_blue: "#0090f8"
     property var navgames_orange: "#ff683a"
@@ -72,7 +75,7 @@ ApplicationWindow {
             anchors.topMargin: 10
             anchors.bottomMargin: 10
 
-            height : buttons_group.implicitHeight
+            height : 40
             // implicitHeight:40
 
             uniformCellSizes: true
@@ -85,6 +88,7 @@ ApplicationWindow {
                 // }
                 Button {
                     text: "settings / back to configuration"
+                    visible: !root.show_start_page
                     onClicked: {
                         root.show_start_page = true;
                     }
