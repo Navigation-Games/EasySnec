@@ -160,6 +160,10 @@ ApplicationWindow {
 
                     // possibly illegal, but it hasnt broken yet!
                     Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
+                    Binding { target: port_selector; property: "currentText"; value: backend.selectedPort }
+
+
+
                     RowLayout {
                         Label {
                             text: "Scoring Mode:"
@@ -197,7 +201,6 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
-                            backend.log('hello!@!!');
                             backend.ping_port();
                         }
 
