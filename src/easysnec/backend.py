@@ -94,7 +94,7 @@ class Backend:
 
             if old_port in current_ports:
                 self.backend_interface.set_selected_port(old_port)
-            else:
+            elif not (old_port is None or old_port == ""):
                 log.warning(
                     f"selected port {old_port} has disappeared from list {current_ports}. we must respond to this wisely"
                 )
