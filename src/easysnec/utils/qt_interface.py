@@ -1,16 +1,19 @@
+import logging
 from enum import Enum
 
-from fastlog import log
+import serial.tools.list_ports
 from PySide6.QtCore import (
-    QStringListModel,
-    QObject,
+    Property,
     QEnum,
+    QObject,
+    QStringListModel,
     Signal,
     Slot,
-    Property,
 )
-import serial.tools.list_ports
+
 from .grading import Grade
+
+logger = logging.getLogger(__name__)
 
 
 class DummyClass(QObject):
@@ -41,13 +44,13 @@ class BackendInterface(QObject):
 
     @Slot()
     def ping_port(self):
-        log.info("pinging port")
+        logger.info("pinging port")
         self.try_connect_to_si_reader.emit()
 
     # --- logging slot
     @Slot(str)
     def log(self, string: str):
-        log.info(string)
+        logger.info(string)
 
     # ------------ QT properties
     # --- time property (rw) (this is our canary property)
