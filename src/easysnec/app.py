@@ -36,7 +36,11 @@ def main() -> None:
     # TODO: This is prob how we embed files in the application
     # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/qrcfiles.html
 
+    # In bundled builds, QML is placed next to the executable rather than
+    # inside the package directory, so try both locations.
     file = Path(__file__).parent / "qml" / "Main.qml"
+    if not file.exists():
+        file = Path(sys.executable).parent / "qml" / "Main.qml"
     logger.info(f"loading qml from {file}")
     engine.load(file)
     if not engine.rootObjects():
@@ -51,7 +55,3 @@ def main() -> None:
 
     # --- start the app
     app.exec()
-
-
-if __name__ == "__main__":
-    main()
