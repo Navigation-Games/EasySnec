@@ -157,25 +157,12 @@ ApplicationWindow {
                         textRole: "display"
                         model: backend.ports
 
-                        function findIndex(value) {
-                            for (let i = 0; i < model.length; i++) {
-                                if (model[i] === value)
-                                    return i
-                            }
-                            return -1
-                        }
                         currentIndex: backend.selectedPort
 
                         onCurrentTextChanged: {
-                            backend.log('changing backend port to ' + currentText)
                             backend.selectedPort = currentIndex
                         }
                     }
-
-                    // possibly illegal, but it hasnt broken yet!
-                    // Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
-                    // Binding { target: port_selector; property: "currentText"; value: backend.selectedPort }
-
 
 
                     RowLayout {
