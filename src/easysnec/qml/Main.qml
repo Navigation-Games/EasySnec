@@ -18,8 +18,6 @@ ApplicationWindow {
     id: root
     title: "EasySnec"
 
-
-
     // TODO: native menu bars
     // https://doc.qt.io/qt-6/qml-qtquick-controls-menubar.html
 
@@ -41,16 +39,16 @@ ApplicationWindow {
     width: 640
     height: 480
 
+    readonly property bool isDarkMode: Application.styleHints.colorScheme === Qt.ColorScheme.Dark
+
     // colors!
     property var navgames_blue: "#0090f8"
     property var navgames_orange: "#ff683a"
     property var success_green: "#9AE99D"
     property var info_blue: "#CBD9FF"
     property var bad_red: "#FF9090"
-    property var neutral_grey: "#DFDFDF"
-    property var dark_grey: "#B3B3B3"
-
-
+    property var header_bg_color: isDarkMode ? "#222222" : "#DFDFDF"
+    property var text_color: isDarkMode ? "#B3B3B3" : "#444444"
 
     header: Rectangle {
         // background
@@ -58,7 +56,7 @@ ApplicationWindow {
         // TODO: get this 20 from child margins.
         // TODO: actually this should be implicit and derived from chidren
         height: childrenRect.height + 20;
-        color: root.neutral_grey
+        color: root.header_bg_color
 
         RowLayout {
 
@@ -112,7 +110,7 @@ ApplicationWindow {
 
                 Label {
 
-                    color: root.dark_grey
+                    color: root.text_color
                     text: backend.time
                     // text: root.currTime
                     // font.pointSize: 17
@@ -140,7 +138,7 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     text: root.connected ? "You're connected. Press START to begin" : "Connect reader and select port to get started"
 
-                    color: "#5D5D5D"
+                    color: root.text_color
                     font.pointSize: 17
                     font.bold: true
                     font.family: "Arial"
@@ -231,7 +229,7 @@ ApplicationWindow {
                 Label {
                     Layout.alignment: Qt.AlignHCenter
 
-                    color: "#0090f8"
+                    color: root.navgames_blue
                     text: root.scoring_output
                     font.pointSize: 40
                     font.bold: true
@@ -248,7 +246,7 @@ ApplicationWindow {
                 Label {
                     Layout.alignment: Qt.AlignHCenter
 
-                    color: "#0090f8"
+                    color: root.navgames_blue
                     text: root.feedback_message
                     font.pointSize: 40
                     font.bold: true
