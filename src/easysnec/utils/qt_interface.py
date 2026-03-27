@@ -88,14 +88,25 @@ class BackendInterface(QObject):
 
     def set_ports(self, new_ports):
         if self._ports.stringList() != new_ports.stringList():
+
+            old_port = self._ports.stringList()[self._selected_port]
+
             self._ports = new_ports
             self.portsChanged.emit(new_ports)
+
+            if old_port in new_ports.stringList():
+                self.set_selected_port(new_ports.stringList().index(old_port))
+            elif not (old_port is None or old_port == ""):
+                log.warning(
+                    f"selected port {old_port} has disappeared from list {new_ports}. we must respond to this wisely"
+                )
+
 
     portsChanged = Signal(QObject)
     ports = Property(QObject, get_ports, set_ports, notify=portsChanged)  # ty: ignore[invalid-argument-type]
 
     # --- selected port property (rw)
-    _selected_port = ""
+    _selected_port = 0
 
     def get_selected_port(self):
         return self._selected_port
@@ -107,11 +118,15 @@ class BackendInterface(QObject):
 
     selectedPortChanged = Signal(str)
     selectedPort = Property(
-        str,
+        int,
         get_selected_port,
         set_selected_port,
         notify=selectedPortChanged,  # ty: ignore[invalid-argument-type]
     )
+
+    @property
+    def selected_port_string(self) -> str:
+        return self._ports.stringList()[self._selected_port]
 
     # --- scoring mode property (rw)
     _scoring_mode = 1

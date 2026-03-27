@@ -164,11 +164,11 @@ ApplicationWindow {
                             }
                             return -1
                         }
-                        currentIndex: findIndex(backend.selectedPort)
+                        currentIndex: backend.selectedPort
 
                         onCurrentTextChanged: {
                             backend.log('changing backend port to ' + currentText)
-                            backend.selectedPort = currentText
+                            backend.selectedPort = currentIndex
                         }
                     }
 
