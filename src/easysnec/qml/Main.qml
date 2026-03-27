@@ -39,7 +39,7 @@ ApplicationWindow {
     width: 640
     height: 480
 
-    readonly property bool isDarkMode: Application.styleHints.colorScheme === Qt.ColorScheme
+    readonly property bool isDarkMode: Application.styleHints.colorScheme === Qt.ColorScheme.Dark
 
     // colors!
     property var navgames_blue: "#0090f8"
