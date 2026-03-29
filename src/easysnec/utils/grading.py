@@ -193,7 +193,21 @@ COURSES = [
     Course("Bird", False, [36, 34, 31, 38, 37]),
     Course("Elephant", False, [37, 34, 31, 40, 39]),
     Course("Crab", False, [39, 31, 32, 35, 37]),
+# Basketball-O Courses
+    Course("Course A", False, [33, 38, 36, 34, 37]),
+    Course("Course A", False, [43, 48, 46, 44, 47]),
+    Course("Course A", False, [143, 148, 146, 144, 147]),
+    Course("Course B", False, [46, 42, 49, 41, 50, 48, 43]),
+    Course("Course B", False, [36, 32, 39, 31, 40, 38, 33]),
+    Course("Course B", False, [146, 142, 149, 141, 150, 148, 143]),
+    Course("Course C", False, [48, 43, 45, 49, 47, 44, 50, 41]),
+    Course("Course C", False, [38, 33, 35, 39, 37, 34, 40, 31]),
+    Course("Course C", False, [148, 143, 145, 149, 147, 144, 150, 141]),
+    Course("Course D", False, [41, 42, 50, 43, 46, 44, 47, 48, 49, 45]),
+    Course("Course D", False, [31, 32, 40, 33, 36, 34, 37, 38, 39, 35]),
+    Course("Course D", False, [141, 142, 150, 143, 146, 144, 147, 148, 149, 145])
 ]
+
 
 ANIMAL_MAPPING = {
     "Frog": 32,
@@ -209,16 +223,27 @@ ANIMAL_MAPPING = {
 }
 
 EMOJI_MAPPING = {
-    32: "🐸",
-    34: "🐙",
-    38: "🐧",
-    40: "🐑",
-    31: "🦁",
-    33: "🐕",
-    35: "🐝",
-    36: "🐦",
-    37: "🐘",
-    39: "🦀",
+    32: "🐸", # frog
+    34: "🐙", # squid
+    38: "🐧", # penguin
+    40: "🐑", # sheep
+    31: "🦁", # lion
+    33: "🐕", # dog
+    35: "🐝", # bee
+    36: "🐦", # bird
+    37: "🐘", # elephant
+    39: "🦀", # crab
 }
+# NEW animal mapping, related to /resources/animals #TODO 
+    # 31: "lion"
+    # 32: "frog"
+    # 33: "dog"
+    # 34: "fish"
+    # 35: "pig"
+    # 36: "tiger"
+    # 37: "elephant"
+    # 38: "penguin"
+    # 39: "turtle"
+    # 40: "sheep"
 
 CURRENT_COURSE = COURSES[9]  # Crab
