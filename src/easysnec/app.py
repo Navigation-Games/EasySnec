@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sys
+import argparse
+import logging
 import signal
-
-from fastlog import log
+import sys
 from pathlib import Path
 
 from PySide6.QtGui import QGuiApplication
@@ -12,7 +12,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from .backend import Backend
 from .utils.qt_interface import BackendInterface
 
-import argparse
+logger = logging.getLogger(__name__)
 
 
 def main() -> None:
@@ -36,8 +36,12 @@ def main() -> None:
     # TODO: This is prob how we embed files in the application
     # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/qrcfiles.html
 
+    # In bundled builds, QML is placed next to the executable rather than
+    # inside the package directory, so try both locations.
     file = Path(__file__).parent / "qml" / "Main.qml"
-    log.info(f"loading qml from {file}")
+    if not file.exists():
+        file = Path(sys.executable).parent / "qml" / "Main.qml"
+    logger.info(f"loading qml from {file}")
     engine.load(file)
     if not engine.rootObjects():
         raise RuntimeError("QML Failed to load")
@@ -51,7 +55,3 @@ def main() -> None:
 
     # --- start the app
     app.exec()
-
-
-if __name__ == "__main__":
-    main()

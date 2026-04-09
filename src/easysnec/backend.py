@@ -1,20 +1,21 @@
 from __future__ import annotations
 
+import logging
 import pprint
 import time
+
 import serial.tools.list_ports
-
-from fastlog import log
-from sportident import SIReaderReadout, SIReaderCardChanged, SIReaderException
-
 from PySide6.QtCore import (
-    QStringListModel,
-    QTimer,
-    QThread,
     QObject,
+    QStringListModel,
+    QThread,
+    QTimer,
 )
+from sportident import SIReaderCardChanged, SIReaderException, SIReaderReadout
 
-from .utils.grading import COURSES, InputData, SuccessStatus, ScoreType
+from .utils.grading import COURSES, InputData, ScoreType, SuccessStatus
+
+logger = logging.getLogger(__name__)
 
 
 class Backend:
@@ -64,7 +65,7 @@ class Backend:
         self.backend_interface.card_result_readout.connect(hack_respond_to_readout)
 
         def get_reader():
-            log.info(
+            logger.info(
                 f"attempting to connect to port {self.backend_interface._selected_port}"
             )
 
@@ -72,7 +73,7 @@ class Backend:
                 self.reader_worker.si_reader = SIReaderReadout(
                     self.backend_interface._selected_port
                 )
-                log.success("connected!")
+                logger.info("connected!")
                 self.reader_worker.si_is_ready = True
             except SIReaderException:
                 self.reader_worker.si_is_ready = False
@@ -95,7 +96,7 @@ class Backend:
             if old_port in current_ports:
                 self.backend_interface.set_selected_port(old_port)
             else:
-                log.warning(
+                logger.warning(
                     f"selected port {old_port} has disappeared from list {current_ports}. we must respond to this wisely"
                 )
 
@@ -113,7 +114,7 @@ class Backend:
         self.reader.terminate()
         self.console.terminate()
         self.timer.stop()
-        log.success("threads safely stopped")
+        logger.info("threads safely stopped")
 
     def report_si_input(self, input_data: InputData):
         # when multiple courses are available, get_closest_course before grading
@@ -124,7 +125,7 @@ class Backend:
             best_guess_course, ScoreType(self.backend_interface._scoring_mode)
         )
 
-        log.info("Correctness: " + pprint.pformat(runner_grade.status))
+        logger.info("Correctness: " + pprint.pformat(runner_grade.status))
 
         # Put stuff in the UI
         self.backend_interface.card_result_readout.emit(runner_grade)
@@ -153,17 +154,17 @@ class ReaderWorker(QObject):
         self.si_is_ready = False
         self.si_reader = None
 
-        log.info("reader worker created")
+        logger.info("reader worker created")
 
     def spin_thread(self):
-        log.warning("starting si loop...")
+        logger.warning("starting si loop...")
 
         while True:
             if not self.si_is_ready:
                 time.sleep(0.1)
                 continue
 
-            log.info("starting instance of si loop...")
+            logger.info("starting instance of si loop...")
             # TODO: make port an argument or pull from the ui someplace
 
             try:
@@ -177,7 +178,7 @@ class ReaderWorker(QObject):
                 )
             except (SIReaderCardChanged, SIReaderException) as e:
                 # this exception (card removed too early) can be ignored
-                log.warning(f"exception: {e}")
+                logger.warning(f"exception: {e}")
 
             # beep
             self.si_reader.ack_sicard()

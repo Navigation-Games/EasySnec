@@ -7,7 +7,7 @@ title = EasySnec
 project_dir = .
 
 # source file entry point path. default = main.py
-input_file = main.py
+input_file = src/easysnec/main.py
 
 # directory where the executable output is generated
 exec_directory = dist
@@ -15,13 +15,13 @@ exec_directory = dist
 # path to the project file relative to project_dir
 project_file = 
 
-# application icon
-icon = /Users/ivy/projects/python/pydisttest/EasySnec/.venv/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/pyside_icon.icns
+# TODO: Acquire an application icon
+icon = ImageOptim__Liquid_Glass_.icns
 
 [python]
 
 # python path
-python_path = /Users/ivy/projects/python/pydisttest/EasySnec/.venv/bin/python
+python_path = .venv/bin/python
 
 # python packages to install
 packages = Nuitka==2.7.11
@@ -34,17 +34,17 @@ android_packages = buildozer==1.5.0,cython==0.29.33
 # paths to required qml files. comma separated
 # normally all the qml files required by the project are added automatically
 # design studio projects include the qml files using qt resources
-qml_files = 
+qml_files = src/easysnec/qml
 
 # excluded qml plugin binaries
 excluded_qml_plugins = 
 
 # qt modules used. comma separated
-modules = Core,DBus,Gui,Widgets
+modules = Core,DBus,Gui,Network,Qml
 
 # qt plugins used by the application. only relevant for desktop deployment
 # for qt plugins used in android application see [android][plugins]
-plugins = accessiblebridge,egldeviceintegrations,generic,iconengines,imageformats,platforminputcontexts,platforms,platforms/darwin,platformthemes,styles,xcbglintegrations
+plugins = accessiblebridge,egldeviceintegrations,generic,iconengines,imageformats,platforminputcontexts,platforms,platforms/darwin,platformthemes,styles,xcbglintegrations,qml
 
 [android]
 
@@ -68,7 +68,7 @@ macos.permissions =
 mode = onefile
 
 # specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --static-libpython=no
+extra_args = --quiet --noinclude-qt-translations --static-libpython=no --follow-imports
 
 [buildozer]
 
