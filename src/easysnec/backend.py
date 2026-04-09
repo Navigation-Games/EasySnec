@@ -69,6 +69,11 @@ class Backend:
             )
 
             try:
+                # discard the old reader if it exists
+                if self.reader_worker.si_reader is not None:
+                    self.reader_worker.si_reader.disconnect()
+                    self.reader_worker.si_reader = None
+
                 self.reader_worker.si_reader = SIReaderReadout(
                     self.backend_interface.selected_port_string
                 )
