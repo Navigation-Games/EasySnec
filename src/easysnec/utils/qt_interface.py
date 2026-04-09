@@ -62,7 +62,9 @@ class BackendInterface(QObject):
             self.timeChanged.emit(new_time)
 
     timeChanged = Signal(str)
-    time = Property(str, get_time, set_time, notify=timeChanged)  # ty: ignore[invalid-argument-type]
+    time = Property(
+        str, get_time, set_time, notify=timeChanged
+    )  # ty: ignore[invalid-argument-type]
 
     # --- name property (rw)
     _name = "name"
@@ -76,7 +78,9 @@ class BackendInterface(QObject):
             self.nameChanged.emit(new_name)
 
     nameChanged = Signal(str)
-    name = Property(str, get_name, set_name, notify=nameChanged)  # ty: ignore[invalid-argument-type]
+    name = Property(
+        str, get_name, set_name, notify=nameChanged
+    )  # ty: ignore[invalid-argument-type]
 
     # --- ports property (rw)
     _ports = QStringListModel(
@@ -101,9 +105,10 @@ class BackendInterface(QObject):
                     f"selected port {old_port} has disappeared from list {new_ports}. we must respond to this wisely"
                 )
 
-
     portsChanged = Signal(QObject)
-    ports = Property(QObject, get_ports, set_ports, notify=portsChanged)  # ty: ignore[invalid-argument-type]
+    ports = Property(
+        QObject, get_ports, set_ports, notify=portsChanged
+    )  # ty: ignore[invalid-argument-type]
 
     # --- selected port property (rw)
     _selected_port = 0
@@ -159,7 +164,9 @@ class BackendInterface(QObject):
             self.courseSetChanged.emit(new_course_set)
 
     courseSetChanged = Signal(str)
-    courseSet = Property(str, get_course_set, set_course_set, notify=courseSetChanged)  # ty: ignore[invalid-argument-type]
+    courseSet = Property(
+        str, get_course_set, set_course_set, notify=courseSetChanged
+    )  # ty: ignore[invalid-argument-type]
 
     # --- app_running property (rw)
     _running = False
@@ -173,4 +180,6 @@ class BackendInterface(QObject):
             self.runningChanged.emit(new_running)
 
     runningChanged = Signal(str)
-    running = Property(bool, get_running, set_running, notify=runningChanged)  # ty: ignore[invalid-argument-type]
+    running = Property(
+        bool, get_running, set_running, notify=runningChanged
+    )  # ty: ignore[invalid-argument-type]

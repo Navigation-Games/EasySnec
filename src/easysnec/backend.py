@@ -93,8 +93,11 @@ class Backend:
             current_time = time.strftime("%H:%M:%S", time.localtime())
             self.backend_interface.set_time(current_time)
 
-            self.backend_interface.set_ports(QStringListModel([port.device for port in serial.tools.list_ports.comports()]))
-
+            self.backend_interface.set_ports(
+                QStringListModel(
+                    [port.device for port in serial.tools.list_ports.comports()]
+                )
+            )
 
         self.timer = QTimer(interval=500)  # msecs
         self.timer.timeout.connect(update_time)
