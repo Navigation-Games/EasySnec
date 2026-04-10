@@ -66,8 +66,8 @@ class BackendInterface(QObject):
 
     timeChanged = Signal(str)
     time = Property(
-        str, get_time, set_time, notify=timeChanged
-    )  # ty: ignore[invalid-argument-type]
+        str, get_time, set_time, notify=timeChanged  # ty: ignore[invalid-argument-type]
+    )
 
     # --- name property (rw)
     _name = "name"
@@ -82,8 +82,8 @@ class BackendInterface(QObject):
 
     nameChanged = Signal(str)
     name = Property(
-        str, get_name, set_name, notify=nameChanged
-    )  # ty: ignore[invalid-argument-type]
+        str, get_name, set_name, notify=nameChanged  # ty: ignore[invalid-argument-type]
+    )
 
     # --- ports property (rw)
     _ports = QStringListModel(
@@ -110,8 +110,11 @@ class BackendInterface(QObject):
 
     portsChanged = Signal(QObject)
     ports = Property(
-        QObject, get_ports, set_ports, notify=portsChanged
-    )  # ty: ignore[invalid-argument-type]
+        QObject,
+        get_ports,
+        set_ports,
+        notify=portsChanged,  # ty: ignore[invalid-argument-type]
+    )
 
     # --- selected port property (rw)
     _selected_port = 0
@@ -168,8 +171,11 @@ class BackendInterface(QObject):
 
     courseSetChanged = Signal(str)
     courseSet = Property(
-        str, get_course_set, set_course_set, notify=courseSetChanged
-    )  # ty: ignore[invalid-argument-type]
+        str,
+        get_course_set,
+        set_course_set,
+        notify=courseSetChanged,  # ty: ignore[invalid-argument-type]
+    )
 
     # --- app_running property (rw)
     _running = False
@@ -184,5 +190,8 @@ class BackendInterface(QObject):
 
     runningChanged = Signal(str)
     running = Property(
-        bool, get_running, set_running, notify=runningChanged
-    )  # ty: ignore[invalid-argument-type]
+        bool,
+        get_running,
+        set_running,
+        notify=runningChanged,  # ty: ignore[invalid-argument-type]
+    )
