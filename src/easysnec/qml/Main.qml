@@ -154,10 +154,15 @@ ApplicationWindow {
                         id:port_selector
                         textRole: "display"
                         model: backend.ports
+
+                        currentIndex: backend.selectedPort
+
+                        onCurrentTextChanged: {
+                            backend.selectedPort = currentIndex
+                        }
                     }
 
-                    // possibly illegal, but it hasnt broken yet!
-                    Binding { target: backend; property: "selectedPort"; value: port_selector.currentText }
+
                     RowLayout {
                         Label {
                             text: "Scoring Mode:"
@@ -195,7 +200,6 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
-                            backend.log('hello!@!!');
                             backend.ping_port();
                         }
 

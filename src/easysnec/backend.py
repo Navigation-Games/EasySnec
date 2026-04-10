@@ -70,8 +70,13 @@ class Backend:
             )
 
             try:
+                # discard the old reader if it exists
+                if self.reader_worker.si_reader is not None:
+                    self.reader_worker.si_reader.disconnect()
+                    self.reader_worker.si_reader = None
+
                 self.reader_worker.si_reader = SIReaderReadout(
-                    self.backend_interface._selected_port
+                    self.backend_interface.selected_port_string
                 )
                 logger.info("connected!")
                 self.reader_worker.si_is_ready = True
@@ -89,16 +94,11 @@ class Backend:
             current_time = time.strftime("%H:%M:%S", time.localtime())
             self.backend_interface.set_time(current_time)
 
-            old_port = self.backend_interface._selected_port
-            current_ports = [port.device for port in serial.tools.list_ports.comports()]
-            self.backend_interface.set_ports(QStringListModel(current_ports))
-
-            if old_port in current_ports:
-                self.backend_interface.set_selected_port(old_port)
-            else:
-                logger.warning(
-                    f"selected port {old_port} has disappeared from list {current_ports}. we must respond to this wisely"
+            self.backend_interface.set_ports(
+                QStringListModel(
+                    [port.device for port in serial.tools.list_ports.comports()]
                 )
+            )
 
         self.timer = QTimer(interval=500)  # msecs
         self.timer.timeout.connect(update_time)
@@ -111,8 +111,8 @@ class Backend:
         self.backend_interface.backend_started.emit()
 
     def shutdown(self):
-        self.reader.terminate()
-        self.console.terminate()
+        self.reader_thread.terminate()
+        self.console_thread.terminate()
         self.timer.stop()
         logger.info("threads safely stopped")
 
