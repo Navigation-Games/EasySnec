@@ -15,9 +15,6 @@ exec_directory = dist
 # path to the project file relative to project_dir
 project_file = 
 
-# TODO: Acquire an application icon
-icon = ImageOptim__Liquid_Glass_.icns
-
 [python]
 
 # python path
