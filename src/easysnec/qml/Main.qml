@@ -39,6 +39,9 @@ ApplicationWindow {
     width: 640
     height: 480
 
+    minimumHeight: 400
+    minimumWidth: setup_pane.implicitWidth
+
     readonly property bool isDarkMode: Application.styleHints.colorScheme === Qt.ColorScheme.Dark
 
     // colors!
@@ -70,7 +73,7 @@ ApplicationWindow {
             anchors.topMargin: 10
             anchors.bottomMargin: 10
 
-            height : buttons_group.implicitHeight
+            height : 40
             // implicitHeight:40
 
             uniformCellSizes: true
@@ -83,6 +86,7 @@ ApplicationWindow {
                 // }
                 Button {
                     text: "settings / back to configuration"
+                    visible: !root.show_start_page
                     onClicked: {
                         root.show_start_page = true;
                     }
