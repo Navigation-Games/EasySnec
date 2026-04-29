@@ -20,6 +20,9 @@ def main() -> None:
     parser.add_argument("--debug-console", action="store_true")
     args = parser.parse_args()
 
+    logging.basicConfig(level=logging.INFO)
+
+
     # Set up the application window
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()

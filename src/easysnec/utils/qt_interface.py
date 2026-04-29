@@ -1,3 +1,5 @@
+from typing import Sequence
+from serial.tools.list_ports_common import ListPortInfo
 import logging
 from enum import Enum
 
@@ -12,8 +14,20 @@ from PySide6.QtCore import (
 )
 
 from .grading import Grade
+import sportident
 
 logger = logging.getLogger(__name__)
+
+
+from functools import cache
+
+@cache
+def display_port(port:str) -> str:
+    try:
+        sportident.SIReaderReadout(port)
+        return port + "✅"
+    except:
+        return port + "❌"
 
 
 class DummyClass(QObject):
@@ -41,11 +55,6 @@ class BackendInterface(QObject):
     score_scored = Signal()
     try_connect_to_si_reader = Signal()
     card_result_readout = Signal(Grade)
-
-    @Slot()
-    def ping_port(self):
-        logger.info("pinging port")
-        self.try_connect_to_si_reader.emit()
 
     # --- logging slot
     @Slot(str)
@@ -112,7 +121,6 @@ class BackendInterface(QObject):
     ports = Property(
         QObject,
         get_ports,
-        set_ports,
         notify=portsChanged,  # ty: ignore[invalid-argument-type]
     )
 
@@ -133,6 +141,26 @@ class BackendInterface(QObject):
         get_selected_port,
         set_selected_port,
         notify=selectedPortChanged,  # ty: ignore[invalid-argument-type]
+    )
+
+
+    # --- port connected property (r)
+    _port_connected = False
+
+    def get_port_connected(self):
+        return self._port_connected
+
+    def set_port_connected(self, new_port_connected):
+        if self._port_connected != new_port_connected:
+            self._port_connected = new_port_connected
+            self.portConnectedChanged.emit(new_port_connected)
+
+    portConnectedChanged = Signal(str)
+    portConnected = Property(
+        bool,
+        get_port_connected,
+        set_port_connected,
+        notify=portConnectedChanged,  # ty: ignore[invalid-argument-type]
     )
 
     @property
