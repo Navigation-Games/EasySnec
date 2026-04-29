@@ -177,9 +177,6 @@ ApplicationWindow {
                             textRole: "text"
                             valueRole: "value"
                             onActivated: {
-                                backend.log("hello")
-                                backend.log(backend.ports.length())
-
                                 backend.log("selected scoring mode: " + scoring_mode_selector.currentText + " " + scoring_mode_selector.currentValue)
                                 backend.scoringMode = scoring_mode_selector.currentValue
                             }
