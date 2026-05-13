@@ -74,19 +74,20 @@ class Backend:
                 if self.reader_worker.si_reader is not None:
                     self.reader_worker.si_reader.disconnect()
                     self.reader_worker.si_reader = None
+                    self.backend_interface.set_port_connected(False)
 
                 self.reader_worker.si_reader = SIReaderReadout(
                     self.backend_interface.selected_port_string
                 )
                 logger.info("connected!")
-                self.reader_worker.si_is_ready = True
+
+                self.backend_interface.set_port_connected(True)
             except SIReaderException:
-                self.reader_worker.si_is_ready = False
                 raise RuntimeError(
                     f"Could not open SI reader on port {self.backend_interface._selected_port}"
                 )
 
-        self.backend_interface.try_connect_to_si_reader.connect(get_reader)
+        self.backend_interface.selectedPortChanged.connect(get_reader)
 
         # --- create our debug timer
         def update_time():

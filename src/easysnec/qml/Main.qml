@@ -204,10 +204,9 @@ ApplicationWindow {
                         // }
                         onClicked: {
                             root.show_start_page = false;
-                            backend.ping_port();
                         }
 
-                        // enabled: root.connected
+                        enabled: backend.portConnected
                     }
                 }
             }

@@ -11,9 +11,22 @@ from PySide6.QtCore import (
     Slot,
 )
 
+from functools import cache
 from .grading import Grade
+import sportident
 
 logger = logging.getLogger(__name__)
+
+
+
+
+@cache
+def display_port(port: str) -> str:
+    try:
+        sportident.SIReaderReadout(port)
+        return port + "✅"
+    except sportident.SIReaderException:
+        return port + "❌"
 
 
 class DummyClass(QObject):
@@ -42,11 +55,6 @@ class BackendInterface(QObject):
     try_connect_to_si_reader = Signal()
     card_result_readout = Signal(Grade)
 
-    @Slot()
-    def ping_port(self):
-        logger.info("pinging port")
-        self.try_connect_to_si_reader.emit()
-
     # --- logging slot
     @Slot(str)
     def log(self, string: str):
@@ -66,7 +74,10 @@ class BackendInterface(QObject):
 
     timeChanged = Signal(str)
     time = Property(
-        str, get_time, set_time, notify=timeChanged  # ty: ignore[invalid-argument-type]
+        str,
+        get_time,
+        set_time,
+        notify=timeChanged,  # ty: ignore[invalid-argument-type]
     )
 
     # --- name property (rw)
@@ -82,7 +93,10 @@ class BackendInterface(QObject):
 
     nameChanged = Signal(str)
     name = Property(
-        str, get_name, set_name, notify=nameChanged  # ty: ignore[invalid-argument-type]
+        str,
+        get_name,
+        set_name,
+        notify=nameChanged,  # ty: ignore[invalid-argument-type]
     )
 
     # --- ports property (rw)
@@ -95,7 +109,6 @@ class BackendInterface(QObject):
 
     def set_ports(self, new_ports):
         if self._ports.stringList() != new_ports.stringList():
-
             old_port = self._ports.stringList()[self._selected_port]
 
             self._ports = new_ports
@@ -112,7 +125,6 @@ class BackendInterface(QObject):
     ports = Property(
         QObject,
         get_ports,
-        set_ports,
         notify=portsChanged,  # ty: ignore[invalid-argument-type]
     )
 
@@ -133,6 +145,25 @@ class BackendInterface(QObject):
         get_selected_port,
         set_selected_port,
         notify=selectedPortChanged,  # ty: ignore[invalid-argument-type]
+    )
+
+    # --- port connected property (r)
+    _port_connected = False
+
+    def get_port_connected(self):
+        return self._port_connected
+
+    def set_port_connected(self, new_port_connected):
+        if self._port_connected != new_port_connected:
+            self._port_connected = new_port_connected
+            self.portConnectedChanged.emit(new_port_connected)
+
+    portConnectedChanged = Signal(str)
+    portConnected = Property(
+        bool,
+        get_port_connected,
+        set_port_connected,
+        notify=portConnectedChanged,  # ty: ignore[invalid-argument-type]
     )
 
     @property
