@@ -22,7 +22,6 @@ def main() -> None:
 
     logging.basicConfig(level=logging.INFO)
 
-
     # Set up the application window
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()

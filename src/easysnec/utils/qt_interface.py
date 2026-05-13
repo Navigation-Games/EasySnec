@@ -1,5 +1,3 @@
-from typing import Sequence
-from serial.tools.list_ports_common import ListPortInfo
 import logging
 from enum import Enum
 
@@ -13,20 +11,21 @@ from PySide6.QtCore import (
     Slot,
 )
 
+from functools import cache
 from .grading import Grade
 import sportident
 
 logger = logging.getLogger(__name__)
 
 
-from functools import cache
+
 
 @cache
-def display_port(port:str) -> str:
+def display_port(port: str) -> str:
     try:
         sportident.SIReaderReadout(port)
         return port + "✅"
-    except:
+    except sportident.SIReaderException:
         return port + "❌"
 
 
@@ -75,7 +74,10 @@ class BackendInterface(QObject):
 
     timeChanged = Signal(str)
     time = Property(
-        str, get_time, set_time, notify=timeChanged  # ty: ignore[invalid-argument-type]
+        str,
+        get_time,
+        set_time,
+        notify=timeChanged,  # ty: ignore[invalid-argument-type]
     )
 
     # --- name property (rw)
@@ -91,7 +93,10 @@ class BackendInterface(QObject):
 
     nameChanged = Signal(str)
     name = Property(
-        str, get_name, set_name, notify=nameChanged  # ty: ignore[invalid-argument-type]
+        str,
+        get_name,
+        set_name,
+        notify=nameChanged,  # ty: ignore[invalid-argument-type]
     )
 
     # --- ports property (rw)
@@ -104,7 +109,6 @@ class BackendInterface(QObject):
 
     def set_ports(self, new_ports):
         if self._ports.stringList() != new_ports.stringList():
-
             old_port = self._ports.stringList()[self._selected_port]
 
             self._ports = new_ports
@@ -142,7 +146,6 @@ class BackendInterface(QObject):
         set_selected_port,
         notify=selectedPortChanged,  # ty: ignore[invalid-argument-type]
     )
-
 
     # --- port connected property (r)
     _port_connected = False

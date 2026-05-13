@@ -1,6 +1,4 @@
 from __future__ import annotations
-from serial.tools.list_ports_common import ListPortInfo
-import sportident
 
 import logging
 import pprint
@@ -18,9 +16,6 @@ from sportident import SIReaderCardChanged, SIReaderException, SIReaderReadout
 from .utils.grading import COURSES, InputData, ScoreType, SuccessStatus
 
 logger = logging.getLogger(__name__)
-
-
-
 
 
 class Backend:
@@ -91,6 +86,7 @@ class Backend:
                 raise RuntimeError(
                     f"Could not open SI reader on port {self.backend_interface._selected_port}"
                 )
+
         self.backend_interface.selectedPortChanged.connect(get_reader)
 
         # --- create our debug timer
