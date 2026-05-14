@@ -1,0 +1,73 @@
+import { AboutSlint, VerticalBox, Button, ComboBox, ListView } from "std-widgets.slint";
+import { HorizontalDivider } from "material-1.0/ui/components/divider.slint";
+import {Grade, Mistake, ResultType, MistakeType} from "datatypes.slint";
+
+export component RunningWindow inherits Rectangle {
+
+    in property <Grade> grade: {
+        mistakes: [
+            {type: MistakeType.missing, checkpoint: 31},
+            {type: MistakeType.missing, checkpoint: 31},
+            {type: MistakeType.missing, checkpoint: 31}
+        ],
+        result: ResultType.fail,
+        course: 1
+    };
+
+    HorizontalLayout {
+        VerticalBox {
+            HorizontalLayout{
+                spacing: 10px;
+                Text {
+                    text: "Course";
+                    vertical-alignment: TextVerticalAlignment.center;
+                }
+                ComboBox {
+                    model: ["Dog", "Bird", "女"];
+                }
+            }
+
+
+            HorizontalDivider { }
+
+            property <[Mistake]> test: [{},{},{}];
+            ListView {
+                for item[index] in test: Text {
+                    text: "Text \{index} \{test.length}";
+                }
+            }
+        }
+
+        VerticalBox {
+            horizontal-stretch: 1;
+            preferred-width: 100%;
+            response_image:= Image {
+                image-fit: ImageFit.contain;
+            }
+            response_text := Text {
+                horizontal-alignment: TextHorizontalAlignment.center;
+            }
+
+            states [
+                success when grade.result == ResultType.success: {
+                    response_image.source: @image-url("resources/TryAgainFace.png");
+                    response_text.text: "Good job!";
+                }
+                fail when grade.result != ResultType.success: {
+                    response_text.text: "Try Again!";
+                    response_image.source: @image-url("resources/YayFace.png");
+                }
+            ]
+        }
+    }
+
+    VerticalBox {
+        alignment: LayoutAlignment.end;
+        HorizontalLayout {
+            alignment: LayoutAlignment.end;
+            Button {
+                text: "Return to setup";
+            }
+        }
+    }
+}

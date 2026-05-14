@@ -1,0 +1,120 @@
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { SettingsWindow } from "settings.slint";
+import { RunningWindow } from "running.slint";
+import { Grade, GuiState } from "datatypes.slint";
+
+export component AppWindow inherits Window {
+    in property<bool> si_connected: false;
+    in property<string> time;
+    in property<bool> feature_flag_mock_window: false;
+    in property<[string]> available_ports;
+    in property<[Grade]> grades;
+
+    // in property<MistakeType> m;
+    // out property selected_port (?)
+    // out property scoring_mode (?)
+    // out property course_set (?)
+
+    callback request-decorative-button();
+    callback request-connect-si(port:string);
+    callback request-check-si();
+    callback request-update-ports();
+    callback request-update-time();
+
+    // init => {
+    //     request-update-ports();
+    //     request-update-time();
+    // }
+
+    // internal properties
+    property<GuiState> guiState: GuiState.settings;
+
+    time_refresh_timer := Timer {
+        running: guiState == GuiState.settings;
+        interval: 1s;
+        triggered => {request-update-time()}
+    }
+
+    port_refresh_timer := Timer {
+        running: guiState == GuiState.settings;
+        interval: 1s;
+        triggered => {request-update-ports()}
+    }
+
+    si_ping_timer := Timer {
+        running: guiState == GuiState.running;
+        interval: 1s;
+        triggered => {request-check-si()}
+    }
+
+
+    // property var navgames_blue: "#0090f8"
+    // property var navgames_orange: "#ff683a"
+    // property var success_green: "#9AE99D"
+    // property var info_blue: "#CBD9FF"
+    // property var bad_red: "#FF9090"
+    // property var header_bg_color: isDarkMode ? "#222222" : "#DFDFDF"
+    // property var text_color: isDarkMode ? "#B3B3B3" : "#444444"
+    preferred-height: 480px;
+    preferred-width: 640px;
+    // [TODO]: verify that this works on windows / some platform that renders icons
+    icon: @image-url("resources/navigation_games_logo_no_background.png");
+
+    VerticalLayout {
+        header := Rectangle {
+            background: #313131;
+            drop-shadow-blur: 2px;
+            drop-shadow-color: #000000;
+            // [TODO]: paramterize, or make implicit from button
+            height: 40px;
+
+            HorizontalBox {
+
+                // [TODO]: header left and right are still different sizes! how can I fix this? fix the middle component's location? left_width <> right_width?
+                header_left := HorizontalLayout {
+                    alignment: LayoutAlignment.start;
+                    horizontal-stretch: 1;
+                    preferred-width: 100%;
+
+                    Button {
+                        text: "Decorative Button";
+                        clicked => {
+                            root.request-decorative-button();
+                        }
+                    }
+                }
+                Image {
+                    source: @image-url("resources/navigation_games_logo_no_background.png");
+                    image-fit: ImageFit.contain;
+
+                    // [TODO]: parametrize
+                    min-width: 40px;
+                    preferred-width: 40px;
+                }
+                header_right := HorizontalLayout {
+                    alignment: LayoutAlignment.end;
+                    horizontal-stretch: 1;
+                    preferred-width: 100%;
+                    Text {
+                        font-size: 11pt;
+                        overflow: TextOverflow.clip;
+                        text: root.time;
+                        vertical-alignment: TextVerticalAlignment.center;
+                    }
+                }
+
+            }
+        }
+
+        if guiState == GuiState.settings: SettingsWindow {
+            si_connected: false;
+            feature_flag_course_sets: false;
+
+            available_ports: available_ports;
+            request-connect-si(port) => { request-connect-si(port); }
+        }
+        if guiState == GuiState.running: RunningWindow {}
+
+        // optional footer goes here
+    }
+}

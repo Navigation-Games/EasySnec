@@ -8,3 +8,10 @@ This is a todo list! Should it live in the github issues page? Probly, but I'm l
 - [ ] Course upload backend
 - [ ] Course upload frontend
 - [x] Implement typeguard (note - this will only guard function calls. It does no checking whatsoever on dataclasses)
+
+
+- [ ] guess if student forgot about order?
+    - say "5/5, but out of order!"
+    - maybe just if only swap errors
+- [ ] feedback screen needs a dropdown to change course
+- [ ]
