@@ -18,8 +18,6 @@ import sportident
 logger = logging.getLogger(__name__)
 
 
-
-
 @cache
 def display_port(port: str) -> str:
     try:

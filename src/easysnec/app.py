@@ -1,4 +1,5 @@
 from __future__ import annotations
+from PySide6.QtCore import QObject, Signal, Property
 
 import argparse
 import logging
@@ -11,9 +12,28 @@ from PySide6.QtQml import QQmlApplicationEngine
 
 from .backend import Backend
 from .utils.qt_interface import BackendInterface
+from .utils.grading import QGrade,Grade,InputData,Course,ScoreType
+import datetime as dt
+import uuid
 
 logger = logging.getLogger(__name__)
 
+def example_input_incomplete() -> InputData:
+    start = dt.datetime(2025, 3, 14, 9, 30, 17)
+    finish = dt.datetime.min  # finish time precedes start time
+    punches = [
+        (42, dt.datetime(2025, 3, 14, 9, 37, 2)),
+        (43, dt.datetime(2025, 3, 14, 9, 57, 8)),
+        (49, dt.datetime(2025, 3, 14, 10, 9, 44)),
+    ]
+    return InputData(
+        card_id=123,
+        start_time=start,
+        finish_time=finish,
+        punches=punches,
+        reading_id=uuid.uuid4(),
+        # reading_id="202503140930170000000123",
+    )
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -30,6 +50,11 @@ def main() -> None:
     # --- connect backend
     backend_interface = BackendInterface()
     context.setContextProperty("backend", backend_interface)
+    
+
+    tmp = QGrade( Grade(example_input_incomplete(), Course(course_name="tutorial-O", is_score_o=False, stations=[42, 43, 49]), ScoreType.SCORE_O) )
+    context.setContextProperty("creature", tmp)
+    
     backend = Backend(
         backend_interface, engine, enable_debug_console=args.debug_console
     )

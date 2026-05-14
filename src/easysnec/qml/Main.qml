@@ -140,7 +140,8 @@ ApplicationWindow {
 
                 Label {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    text: root.connected ? "You're connected. Press START to begin" : "Connect reader and select port to get started"
+                    text: root.connected ? "You're connected. Press START to begin" : creature.correct
+                    // text: root.connected ? "You're connected. Press START to begin" : "Connect reader and select port to get started"
 
                     color: root.text_color
                     font.pointSize: 17

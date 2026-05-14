@@ -1,4 +1,5 @@
 from __future__ import annotations
+from PySide6.QtCore import QObject, Property
 
 import datetime as dt
 import uuid
@@ -64,6 +65,19 @@ class InputData:
 
     def score_against(self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O):
         return Grade(self, course, score_type)
+
+
+class QGrade(QObject):
+    def __init__(self, grade:Grade):
+        super().__init__()
+
+        self._correct:bool = grade.status == SuccessStatus.SUCCESS
+        # self._errors:[error] = 
+        # self._time: 
+
+    @Property(bool)
+    def correct(self):
+        return self._correct
 
 
 @dataclass(frozen=True)
