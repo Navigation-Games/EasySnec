@@ -42,6 +42,10 @@
               libxkbcommon
               dbus
               wayland
+              # needed for slint
+              expat
+              # fontconfig
+              # pkg-config
             ];
 
             LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:/run/opengl-driver/lib/${pkgs.lib.makeLibraryPath nativeBuildInputs}";

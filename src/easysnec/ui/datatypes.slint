@@ -1,0 +1,22 @@
+export enum MistakeType {missing, shuffle}
+export enum ResultType {success, fail}
+
+export struct Mistake {
+    type: MistakeType,
+    checkpoint: int,
+}
+export struct Grade {
+    mistakes: [Mistake],
+    result: ResultType,
+    course: int,
+}
+
+
+export enum GuiState {
+    settings,running
+}
+
+// export struct BackendState {
+//     si_connected: bool,
+//     other_thing: string,
+// }
