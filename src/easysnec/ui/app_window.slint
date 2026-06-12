@@ -1,14 +1,20 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { SettingsWindow } from "settings.slint";
 import { RunningWindow } from "running.slint";
-import { Grade, GuiState } from "datatypes.slint";
+import { CourseEditor } from "course_editor.slint";
+import { Grade, GuiState, Course, Utils, Mistake, MistakeType } from "datatypes.slint";
+import { MockSIController } from "mock_window.slint";
 
+export { Utils, Grade }
 export component AppWindow inherits Window {
     in property<bool> si_connected: false;
     in property<string> time;
     in property<bool> feature_flag_mock_window: false;
     in property<[string]> available_ports;
     in property<[Grade]> grades;
+
+    in property<[string]> score_mode_options;
+    out property<string> score_mode;
 
     // in property<MistakeType> m;
     // out property selected_port (?)
@@ -20,31 +26,30 @@ export component AppWindow inherits Window {
     callback request-check-si();
     callback request-update-ports();
     callback request-update-time();
+    pure callback display_course(course:Course) -> string;
 
-    // init => {
-    //     request-update-ports();
-    //     request-update-time();
-    // }
+    callback find(array:[string], value:string) -> int;
 
     // internal properties
     property<GuiState> guiState: GuiState.settings;
+    // property<GuiState> guiState: GuiState.settings;
 
     time_refresh_timer := Timer {
         running: guiState == GuiState.settings;
         interval: 1s;
-        triggered => {request-update-time()}
+        triggered => { request-update-time() }
     }
 
     port_refresh_timer := Timer {
         running: guiState == GuiState.settings;
         interval: 1s;
-        triggered => {request-update-ports()}
+        triggered => { request-update-ports() }
     }
 
     si_ping_timer := Timer {
         running: guiState == GuiState.running;
         interval: 1s;
-        triggered => {request-check-si()}
+        triggered => { request-check-si() }
     }
 
 
@@ -60,6 +65,9 @@ export component AppWindow inherits Window {
     // [TODO]: verify that this works on windows / some platform that renders icons
     icon: @image-url("resources/navigation_games_logo_no_background.png");
 
+
+
+
     VerticalLayout {
         header := Rectangle {
             background: #313131;
@@ -67,6 +75,7 @@ export component AppWindow inherits Window {
             drop-shadow-color: #000000;
             // [TODO]: paramterize, or make implicit from button
             height: 40px;
+
 
             HorizontalBox {
 
@@ -107,14 +116,27 @@ export component AppWindow inherits Window {
         }
 
         if guiState == GuiState.settings: SettingsWindow {
-            si_connected: false;
+            si_connected: si_connected;
             feature_flag_course_sets: false;
 
             available_ports: available_ports;
+            // find(array, value) => { root.find(array, value) };
             request-connect-si(port) => { request-connect-si(port); }
-        }
-        if guiState == GuiState.running: RunningWindow {}
+            request-start => {root.guiState = GuiState.running}
 
-        // optional footer goes here
+            score_mode_options: score_mode_options;
+            changed score_mode => { root.score_mode = self.score_mode; };
+        }
+        if guiState == GuiState.running: RunningWindow {
+            grade:grade;
+            request-return-to-settings => {root.guiState = GuiState.running}
+        }
+        if guiState == GuiState.editor: CourseEditor {
+            display_course(course) => { display_course(course) }
+        }
     }
+
+    in property <Grade> grade;
+
+    // optional footer goes here
 }

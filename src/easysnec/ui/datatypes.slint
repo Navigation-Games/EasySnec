@@ -1,4 +1,9 @@
-export enum MistakeType {missing, shuffle}
+export struct Course {
+    name: string,
+    checkpoints: [int]
+}
+
+export enum MistakeType {missed, shuffle}
 export enum ResultType {success, fail}
 
 export struct Mistake {
@@ -7,13 +12,18 @@ export struct Mistake {
 }
 export struct Grade {
     mistakes: [Mistake],
-    result: ResultType,
-    course: int,
+    result: string,
+    course: string,
+    time: string,
 }
 
 
 export enum GuiState {
-    settings,running
+    settings,running,editor
+}
+
+export global Utils {
+    pure callback find(array:[string], value: string) -> int;
 }
 
 // export struct BackendState {

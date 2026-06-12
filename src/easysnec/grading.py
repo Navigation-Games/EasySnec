@@ -62,7 +62,7 @@ class InputData:
             ),
         )
 
-    def score_against(self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O):
+    def score_against(self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O) -> Grade:
         return Grade(self, course, score_type)
 
 
@@ -118,15 +118,17 @@ class Grade:
     def missed_checkpoints(self) -> list[str]:
         if self.status is SuccessStatus.SUCCESS:
             return []
-        missed_checkpoints = [
+
+        # TODO - make sure this is ordered correctly!
+        return [
             station
             for station in self.course.stations
             if station not in self.input_data.stations
         ]
-        return [
-            EMOJI_MAPPING.get(checkpoint, str(checkpoint))
-            for checkpoint in missed_checkpoints
-        ]
+        # return [
+        #     EMOJI_MAPPING.get(checkpoint, str(checkpoint))
+        #     for checkpoint in missed_checkpoints
+        # ]
 
     @cached_property
     def extra_checkpoints(self) -> list[str]:

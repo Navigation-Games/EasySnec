@@ -1,0 +1,45 @@
+import { AboutSlint, VerticalBox, ListView, HorizontalBox, TextEdit, Button, LineEdit } from "std-widgets.slint";
+import { Course } from "datatypes.slint";
+
+export component CourseEditor inherits VerticalBox {
+
+    pure callback display_course(course:Course) -> string;
+
+    property <[Course]> courses: [
+        {name: "bird", checkpoints: [31,35]},
+        {name: "bee", checkpoints: [31,35]},
+        {name: "bat", checkpoints: [31,35]},
+    ];
+
+    HorizontalBox {
+        Text {
+            text: "Course Editor";
+        }
+        Button {
+            text: "New Course";
+        }
+    }
+    ListView {
+        for course in courses: Button {
+            text: display_course(course);
+        }
+
+        // for course in courses: HorizontalBox {
+        //     Text { text: course; }
+        //     Rectangle { background: green; }
+        // }
+    }
+
+    LineEdit {}
+    // TextInput {}
+
+    HorizontalBox {
+        for i in [
+            31,32,33,34,35,36,37,38,39,40
+        ]: Button {
+            text: i;
+        }
+    }
+
+
+}

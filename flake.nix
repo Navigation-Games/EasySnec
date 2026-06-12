@@ -21,7 +21,6 @@
         in pkgs.mkShell rec {
             name = "Alva Data Processing";
 
-            # Use this version of the python package for GUI support (the alternative is Qt Hell)
             packages = with pkgs; [
               python314
               uv
@@ -48,7 +47,8 @@
               # pkg-config
             ];
 
-            LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:/run/opengl-driver/lib/${pkgs.lib.makeLibraryPath nativeBuildInputs}";
+            LD_LIBRARY_PATH = "/run/opengl-driver/lib/:${pkgs.lib.makeLibraryPath nativeBuildInputs}";
+            UV_NO_MANAGED_PYTHON=true;
         }
       );
     };
