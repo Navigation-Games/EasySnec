@@ -45,6 +45,9 @@
               expat
               # fontconfig
               # pkg-config
+
+              alsa-lib
+              ffmpeg_7
             ];
 
             LD_LIBRARY_PATH = "/run/opengl-driver/lib/:${pkgs.lib.makeLibraryPath nativeBuildInputs}";

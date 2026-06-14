@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pygments.lexers.installers import DebianControlLexer
 from serial.tools.list_ports_common import ListPortInfo
 from typing import override, Protocol, Self, overload
 import asyncio
@@ -7,6 +6,8 @@ from itertools import zip_longest
 import logging
 import time
 import pprint
+import random
+
 
 import click
 import slint
@@ -14,14 +15,14 @@ import slint.models
 from sportident import SIReaderReadout, SIReaderException, SIReaderCardChanged
 import serial.tools.list_ports
 
-from easysnec.grading import InputData, COURSES, ScoreType, Grade
+from easysnec.grading import InputData, COURSES, ScoreType, Grade, Course, SuccessStatus
 
 logger = logging.getLogger(__name__)
 
+from pathlib import Path
 
 import playsound3
 
-# playsound3.playsound(Path(__dir__))
 
 
 # Load the slint entry-points
@@ -33,6 +34,7 @@ try:
     SlintGrade = loader.app_window.Grade
     SlintMistake = loader.app_window.Mistake
     SlintMistakeType = loader.app_window.MistakeType
+    # SlintSIInputData = loader.app_window.SIInputData
 
 except slint.CompileError as e:
     print(e.message)
@@ -43,14 +45,57 @@ except slint.CompileError as e:
 
 
 def slint_grade_from_grade(grade: Grade):
+
+    mistakes = [
+        SlintMistake(
+            checkpoint=c+1,
+            type = SlintMistakeType.missed
+        )
+        for c in grade.missed_checkpoint_indices
+    ]
+
+    if not grade.input_data.start_time:
+        mistakes.insert(0, SlintMistake(
+            checkpoint=-1,
+            type = SlintMistakeType.no_start
+        ))
+    if not grade.input_data.finish_time:
+        mistakes.append(SlintMistake(
+            checkpoint=-2,
+            type = SlintMistakeType.no_finish
+        ))
+
+
+    if grade.status == SuccessStatus.SUCCESS:
+        status = "success"
+    if grade.status == SuccessStatus.INCOMPLETE:
+        status = "incomplete"
+    if grade.status == SuccessStatus.MISSES:
+        status = "misses"
+
+    if not grade.input_data.start_time or not grade.input_data.finish_time:
+        time_text = ""
+    else:
+        time_delta = (grade.input_data.finish_time-grade.input_data.start_time)
+        minutes = int(time_delta.seconds/60)
+        seconds = time_delta.seconds%60
+        time_text = f"{minutes:02}:{seconds:02}"
+
     return SlintGrade(
         course=grade.course.course_name,
-        result=str(grade.status),
-        mistakes=slint.ListModel(map(lambda c: SlintMistake(
-            checkpoint=c,
-            type = SlintMistakeType.missed
-        ), grade.missed_checkpoints))
+        result=status,
+        time=time_text,
+        mistakes=slint.ListModel(mistakes)
     )
+
+# def slint_input_from_input(input:InputData):
+
+#     return SlintSIInputData (
+#         card_id= int,
+#         start_time= time.strftime("%H:%M:%S", input.start_time) if input.start_time else None,
+#         finish_time= time.strftime("%H:%M:%S", input.finish_time),
+#         punches= [int]
+#     )
 
 
 # define the connection to the main window
@@ -84,6 +129,7 @@ class App(AppWindow):
     # PYTHON-ONLY STATE
     _si_reader: SIReaderReadout | MockSIReader | None = None
     _serial_interface: SerialInterface
+    _input_data: InputData | None
 
     # CALLBACKS
     @slint.callback
@@ -140,27 +186,30 @@ class App(AppWindow):
         if not self._si_reader.poll_sicard():
             return
 
-        # process output
         try:
-            input = InputData.from_si_result(self._si_reader.read_sicard())
+            self._input = InputData.from_si_result(self._si_reader.read_sicard())
 
             # beep
             self._si_reader.ack_sicard()
 
-            self._report_output(input)
+            courses = list(self._input.get_courses_sorted(COURSES))
+            self.courses = slint.ListModel(map(lambda x: x.course_name, courses))
+
+            best_guess_course = courses[0]
+
+            self._report_output(self._input, best_guess_course)
+            self._make_sound(self._input.score_against(best_guess_course))
 
         except (SIReaderCardChanged, SIReaderException) as e:
             # this exception (card removed too early) can be ignored
             logger.warning(f"exception: {e}")
 
 
-    def _report_output(self, input:InputData):
+    def _report_output(self, input:InputData, course:Course):
         print("grading si result...")
 
-        best_guess_course = input.get_closest_course(COURSES)
-
         runner_grade = input.score_against(
-            best_guess_course, ScoreType.ANIMAL_O # TODO: un-hardcode
+            course, ScoreType.ANIMAL_O # TODO: un-hardcode
         )
 
         logger.info("Correctness: " + pprint.pformat(runner_grade.status))
@@ -168,6 +217,27 @@ class App(AppWindow):
         # Put stuff in the UI
         slint_grade = slint_grade_from_grade(runner_grade)
         self.grade = slint_grade
+
+        # import code
+        # code.interact(local=locals(), local_exit=False)
+
+    def _make_sound(self, grade:Grade):
+        sound_path = Path(__file__).parent / 'ui' / 'resources' / 'sounds'
+        if grade.status == SuccessStatus.SUCCESS:
+            sound_path = sound_path / 'good'
+        elif grade.status == SuccessStatus.INCOMPLETE:
+            sound_path = sound_path / 'med'
+        elif grade.status == SuccessStatus.MISSES:
+            sound_path = sound_path / 'bad'
+
+        all_sounds = list(sound_path.glob("*.mp3"))
+        playsound3.playsound(random.choice(all_sounds), block=False)
+
+
+    @slint.callback
+    def request_regrade(self, course:str):
+        course_obj = next(iter(filter(lambda x: x.course_name == course, COURSES)))
+        self._report_output(self._input, course_obj)
 
 
     # UTILITY FUNCTIONS

@@ -2,20 +2,37 @@ This is a todo list! Should it live in the github issues page? Probly, but I'm l
 
 
 Things to do before live demo tomorrow:
-- [ ] ensure the courses+animal mappings are correct
-- [ ] display results
-    - [ ] show missing courses
-    - [ ] show missed start/finish
-    - [ ] show time
-    - [ ] show face
-- [ ] sound -> thru python
+
+
+- [ ] nice to have: emoji or image mappings for mistake display
+- [ ] nice to have: more faces
+
+
+- [x] nice to have: welcome state on the running window
+- [x] sound (via python)
+- [x] fix image backgrounds
+- [x] ensure the courses+animal mappings are correct
+- [x] threads work w/o mock stuff
+- [x] display results
+    - [x] show missing checkpoints
+    - [x] show missed start/finish
+      - [x] show specific face for this
+    - [x] show time
+    - [x] show face
+- [x] update mistakes to show index instead
 - [x] calculate mistakes - for animal-O scoring mode specifically
-    - [ ] make sure the ordering is correct
-- [ ] fix image backgrounds
-- [ ] course dropdown
-- [ ] nice to have: welcome state on the running window
+    - [x] make sure the ordering is correct
+- [x] course dropdown
 - [x] return to setup button
 
+
+
+the flow:
+- backend creates an inputdata object
+- backend sends a grade (time, mistakes, course name) to the front end
+- included is the list of courses, in order of how close they were
+- user sends back the correct course
+- backend recalculates the
 
 
 - [x] Do backend<>frontend data exchange via a "Model" or "Object." This will be more efficient and more structured
@@ -30,14 +47,16 @@ Things to do before live demo tomorrow:
 - [ ] guess if student forgot about order?
     - say "5/5, but out of order!"
     - maybe just if only swap errors
-- [ ] feedback screen needs a dropdown to change course
+- [x] feedback screen needs a dropdown to change course
+
+- [ ] implement a color scheme. no pallete business, just some globals
+- [ ] make the left and right headers equal size
+
 
 What do I need to do before this slint version becomes deployable?
 - [x] issue: changing port list resets the current selection
-- [ ] implement a color scheme. no pallete business, just some globals
 - [x] make a mock si player. it should be graphical!
     - [x] either use slint to make an entirely new window+process, or make a popup window or smth.
-- [ ] make the left and right headers equal size
 
 
 Erkan's EasyGecNG Notes

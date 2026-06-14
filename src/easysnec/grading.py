@@ -62,6 +62,14 @@ class InputData:
             ),
         )
 
+    def get_courses_sorted(self, courses: Iterable[Course]) -> Iterable[Course]:
+        return sorted(
+            courses,
+            key=lambda course: damerau_levenshtein_distance(
+                self.stations, course.stations
+            ),
+        )
+
     def score_against(self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O) -> Grade:
         return Grade(self, course, score_type)
 
@@ -115,7 +123,7 @@ class Grade:
         raise ValueError(f"I don't know how to score {self.score_type}")
 
     @cached_property
-    def missed_checkpoints(self) -> list[str]:
+    def missed_checkpoints(self) -> list[int]:
         if self.status is SuccessStatus.SUCCESS:
             return []
 
@@ -129,6 +137,14 @@ class Grade:
         #     EMOJI_MAPPING.get(checkpoint, str(checkpoint))
         #     for checkpoint in missed_checkpoints
         # ]
+
+    @cached_property
+    def missed_checkpoint_indices(self) -> list[int]:
+        return [
+            index
+            for index,station in enumerate(self.course.stations)
+            if station not in self.input_data.stations
+        ]
 
     @cached_property
     def extra_checkpoints(self) -> list[str]:
@@ -222,5 +238,3 @@ EMOJI_MAPPING = {
     37: "🐘",
     39: "🦀",
 }
-
-CURRENT_COURSE = COURSES[9]  # Crab

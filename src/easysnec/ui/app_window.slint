@@ -2,10 +2,10 @@ import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { SettingsWindow } from "settings.slint";
 import { RunningWindow } from "running.slint";
 import { CourseEditor } from "course_editor.slint";
-import { Grade, GuiState, Course, Utils, Mistake, MistakeType } from "datatypes.slint";
+import { Grade, GuiState, Course, Utils, Mistake, MistakeType, SIInputData } from "datatypes.slint";
 import { MockSIController } from "mock_window.slint";
 
-export { Utils, Grade }
+export { Utils, Grade, SIInputData }
 export component AppWindow inherits Window {
     in property<bool> si_connected: false;
     in property<string> time;
@@ -26,7 +26,7 @@ export component AppWindow inherits Window {
     callback request-check-si();
     callback request-update-ports();
     callback request-update-time();
-    pure callback display_course(course:Course) -> string;
+    pure callback display-course(course:Course) -> string;
 
     callback find(array:[string], value:string) -> int;
 
@@ -48,7 +48,7 @@ export component AppWindow inherits Window {
 
     si_ping_timer := Timer {
         running: guiState == GuiState.running;
-        interval: 1s;
+        interval: 0.1s;
         triggered => { request-check-si() }
     }
 
@@ -85,12 +85,12 @@ export component AppWindow inherits Window {
                     horizontal-stretch: 1;
                     preferred-width: 100%;
 
-                    Button {
-                        text: "Decorative Button";
-                        clicked => {
-                            root.request-decorative-button();
-                        }
-                    }
+                    // Button {
+                    //     text: "Decorative Button";
+                    //     clicked => {
+                    //         root.request-decorative-button();
+                    //     }
+                    // }
                 }
                 Image {
                     source: @image-url("resources/navigation_games_logo_no_background.png");
@@ -129,14 +129,18 @@ export component AppWindow inherits Window {
         }
         if guiState == GuiState.running: RunningWindow {
             grade:grade;
-            request-return-to-settings => {root.guiState = GuiState.running}
+            courses:courses;
+            request-return-to-settings => {root.guiState = GuiState.settings}
+            request-regrade(course) => {request-regrade(course);}
         }
         if guiState == GuiState.editor: CourseEditor {
-            display_course(course) => { display_course(course) }
+            display-course(course) => { display-course(course) }
         }
     }
 
+    callback request-regrade(course:string);
     in property <Grade> grade;
+    in property <[string]> courses;
 
     // optional footer goes here
 }

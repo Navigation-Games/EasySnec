@@ -3,7 +3,7 @@ export struct Course {
     checkpoints: [int]
 }
 
-export enum MistakeType {missed, shuffle}
+export enum MistakeType {missed, shuffle, no-start, no-finish}
 export enum ResultType {success, fail}
 
 export struct Mistake {
@@ -15,6 +15,13 @@ export struct Grade {
     result: string,
     course: string,
     time: string,
+}
+
+export struct SIInputData {
+    card_id: int,
+    start_time: string,
+    finish_time: string,
+    punches: [int]
 }
 
 
