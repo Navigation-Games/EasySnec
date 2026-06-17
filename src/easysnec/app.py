@@ -1,14 +1,15 @@
 from __future__ import annotations
 from serial.tools.list_ports_common import ListPortInfo
-from typing import override, Protocol, Self, overload
+from typing import override, Protocol, Self
 import asyncio
 from itertools import zip_longest
 import logging
 import time
 import pprint
 import random
+from pathlib import Path
 
-
+import playsound3
 import click
 import slint
 import slint.models
@@ -19,9 +20,6 @@ from easysnec.grading import InputData, COURSES, ScoreType, Grade, Course, Succe
 
 logger = logging.getLogger(__name__)
 
-from pathlib import Path
-
-import playsound3
 
 
 
