@@ -1,1 +1,0 @@
-uv run pyside6-deploy -c pysidedeploy.spec

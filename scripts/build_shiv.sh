@@ -1,1 +1,0 @@
-uvx shiv -c easysnec -o dist/easysnec.pyz .

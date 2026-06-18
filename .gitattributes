@@ -1,2 +1,25 @@
-# by default, everything should be LF line endings
-* text eol=lf
+# Text files: normalize to LF in the repo. `text=auto` lets git detect text vs
+# binary instead of forcing EVERY file to be treated as text (the old
+# `* text eol=lf` rule corrupted binary assets by rewriting CRLF->LF inside them).
+* text=auto eol=lf
+
+# Binary assets: never apply line-ending or any other text normalization.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.icns binary
+*.xcf  binary
+*.mp3  binary
+*.wav  binary
+*.ogg  binary
+*.flac binary
+*.pdf  binary
+*.so   binary
+*.dylib binary
+*.dll  binary
+*.pyd  binary
+*.zip  binary
+*.gz   binary

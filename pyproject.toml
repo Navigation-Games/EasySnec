@@ -25,9 +25,9 @@ easysnec = "easysnec.app:main"
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",
-    "pyapp>=4.16.1",
     "typeguard>=4.4.4",
     "pytest-cov>=7.0.0",
+    "nuitka>=2.5",
 ]
 [tool.pytest.ini_options]
 addopts = [
@@ -42,28 +42,9 @@ addopts = [
 
 
 # ------------- BUILD
-# [build-system]
-# requires = ["uv_build>=0.8.24,<0.9.0"]
-# build-backend = "uv_build"
-
-# https://hatch.pypa.io/latest/plugins/builder/binary/
-# https://github.com/pypa/hatch/issues/1436
-# `uvx hatch build --target binary` makes a binary that windows doesnt eat! it crashes immediately tho
+# Single-binary distribution is handled by Nuitka, not a wheel/sdist build
+# backend. See scripts/build_nuitka.sh (macOS/Linux) and
+# scripts/build_nuitka.ps1 (Windows), or the "Build binaries" GitHub workflow.
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.hatch.envs.build]
-detached = true
-[tool.hatch.envs.build.env-vars]
-PYAPP_DISTRIBUTION_EMBED = "true"
-PYAPP_PROJECT_PATH = "{root}/dist/easysnec.tar.gz"
-PYAPP_UV_ENABLED = "true"
-PYAPP_PYTHON_VERSION = "3.11"
-[tool.hatch.envs.build.scripts]
-# run with `uvx hatch run build:binary
-binary = [
-#  "hatch build -c -t sdist",
-#  "mv {root}/dist/easysnec-*.tar.gz {root}/dist/easysnec.tar.gz",
- "hatch build -t binary"
-]
