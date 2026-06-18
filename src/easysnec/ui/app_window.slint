@@ -2,37 +2,34 @@ import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { SettingsWindow } from "settings.slint";
 import { RunningWindow } from "running.slint";
 import { CourseEditor } from "course_editor.slint";
-import { Grade, GuiState, Course, Utils, Mistake, MistakeType, SIInputData } from "datatypes.slint";
+import { Grade, GuiState, Course, Utils, Mistake, MistakeType } from "datatypes.slint";
 import { MockSIController } from "mock_window.slint";
 
-export { Utils, Grade, SIInputData }
+export { Utils, Grade }
 export component AppWindow inherits Window {
     in property<bool> si_connected: false;
     in property<string> time;
     in property<bool> feature_flag_mock_window: false;
     in property<[string]> available_ports;
-    in property<[Grade]> grades;
 
     in property<[string]> score_mode_options;
     out property<string> score_mode;
 
-    // in property<MistakeType> m;
-    // out property selected_port (?)
-    // out property scoring_mode (?)
-    // out property course_set (?)
+    in property <Grade> grade;
+    in property <[string]> courses;
 
     callback request-decorative-button();
     callback request-connect-si(port:string);
     callback request-check-si();
     callback request-update-ports();
     callback request-update-time();
-    pure callback display-course(course:Course) -> string;
+    callback request-regrade(course:string);
 
-    callback find(array:[string], value:string) -> int;
+    // if a callback result will be bound to something, mark it as pure so the constraint solver doesnt perish
+    pure callback display-course(course:Course) -> string;
 
     // internal properties
     property<GuiState> guiState: GuiState.settings;
-    // property<GuiState> guiState: GuiState.settings;
 
     time_refresh_timer := Timer {
         running: guiState == GuiState.settings;
@@ -52,7 +49,7 @@ export component AppWindow inherits Window {
         triggered => { request-check-si() }
     }
 
-
+    // [TODO]: pretty colors!
     // property var navgames_blue: "#0090f8"
     // property var navgames_orange: "#ff683a"
     // property var success_green: "#9AE99D"
@@ -60,38 +57,30 @@ export component AppWindow inherits Window {
     // property var bad_red: "#FF9090"
     // property var header_bg_color: isDarkMode ? "#222222" : "#DFDFDF"
     // property var text_color: isDarkMode ? "#B3B3B3" : "#444444"
+
     preferred-height: 480px;
     preferred-width: 640px;
+
     // [TODO]: verify that this works on windows / some platform that renders icons
     icon: @image-url("resources/navigation_games_logo_no_background.png");
-
-
-
 
     VerticalLayout {
         header := Rectangle {
             background: #313131;
             drop-shadow-blur: 2px;
             drop-shadow-color: #000000;
-            // [TODO]: paramterize, or make implicit from button
+            // [TODO]: parametrize, or make implicit from children
             height: 40px;
-
 
             HorizontalBox {
 
-                // [TODO]: header left and right are still different sizes! how can I fix this? fix the middle component's location? left_width <> right_width?
+                // [TODO]: header left and right are still different sizes! how can I fix this? fix the middle component's location? left_width <=> right_width?
                 header_left := HorizontalLayout {
                     alignment: LayoutAlignment.start;
                     horizontal-stretch: 1;
                     preferred-width: 100%;
-
-                    // Button {
-                    //     text: "Decorative Button";
-                    //     clicked => {
-                    //         root.request-decorative-button();
-                    //     }
-                    // }
                 }
+
                 Image {
                     source: @image-url("resources/navigation_games_logo_no_background.png");
                     image-fit: ImageFit.contain;
@@ -100,6 +89,7 @@ export component AppWindow inherits Window {
                     min-width: 40px;
                     preferred-width: 40px;
                 }
+
                 header_right := HorizontalLayout {
                     alignment: LayoutAlignment.end;
                     horizontal-stretch: 1;
@@ -120,7 +110,6 @@ export component AppWindow inherits Window {
             feature_flag_course_sets: false;
 
             available_ports: available_ports;
-            // find(array, value) => { root.find(array, value) };
             request-connect-si(port) => { request-connect-si(port); }
             request-start => {root.guiState = GuiState.running}
 
@@ -137,10 +126,4 @@ export component AppWindow inherits Window {
             display-course(course) => { display-course(course) }
         }
     }
-
-    callback request-regrade(course:string);
-    in property <Grade> grade;
-    in property <[string]> courses;
-
-    // optional footer goes here
 }

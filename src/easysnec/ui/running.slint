@@ -11,7 +11,7 @@ component MistakeDisplay inherits Text {
             text: "Missed Checkpoint \{mistake.checkpoint}!";
         }
 
-        // TODO: why????
+        // [TODO]: why???? this should work with mistake.type == MistakeType.no_finish etc, but does not
         no_start when mistake.checkpoint == -1: {
             text: "Missed Start";
         }
@@ -29,7 +29,7 @@ component MistakeDisplay inherits Text {
 }
 
 export component RunningWindow inherits Rectangle {
-
+    // the default is useful for the slint viewer, and otherwise discarded
     in property <Grade> grade: {
         course: "dog",
         result: "success",
@@ -42,8 +42,8 @@ export component RunningWindow inherits Rectangle {
             {checkpoint:5, type: MistakeType.missed},
         ],
     };
-
     in property <[string]> courses;
+
     callback request-return-to-settings;
     callback request-regrade(course:string);
 

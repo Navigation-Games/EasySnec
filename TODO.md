@@ -25,16 +25,6 @@ Things to do before live demo tomorrow:
 - [x] course dropdown
 - [x] return to setup button
 
-
-
-the flow:
-- backend creates an inputdata object
-- backend sends a grade (time, mistakes, course name) to the front end
-- included is the list of courses, in order of how close they were
-- user sends back the correct course
-- backend recalculates the
-
-
 - [x] Do backend<>frontend data exchange via a "Model" or "Object." This will be more efficient and more structured
 - [x] Do backend<>frontend event exchange via QT slots
 - [x] Make a functioning and beautiful port selection page

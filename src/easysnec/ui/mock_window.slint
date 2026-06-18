@@ -27,10 +27,6 @@ export component MockSIController inherits Window {
         }
     }
 
-    // background: #313131;
-    // drop-shadow-blur: 2px;
-    // drop-shadow-color: #000000;
-
     VerticalBox {
         alignment: LayoutAlignment.start;
         GroupBox {
@@ -58,6 +54,8 @@ export component MockSIController inherits Window {
             title: "Readout";
             VerticalBox {
                 alignment: LayoutAlignment.start;
+
+                // [TODO]: currently this goes nowhere. We also need times for each of entry!
                 LineEdit {
                     placeholder-text: "1, 2, 3";
                 }

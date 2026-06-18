@@ -54,16 +54,17 @@ def slint_grade_from_grade(grade: Grade):
 
     if not grade.input_data.start_time:
         mistakes.insert(0, SlintMistake(
-            checkpoint=-1,
+            checkpoint=-1, # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
             type = SlintMistakeType.no_start
         ))
     if not grade.input_data.finish_time:
         mistakes.append(SlintMistake(
-            checkpoint=-2,
+            checkpoint=-2, # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
             type = SlintMistakeType.no_finish
         ))
 
 
+    # TODO: There ought to be some sort of mapping from slint's enums to ours
     if grade.status == SuccessStatus.SUCCESS:
         status = "success"
     if grade.status == SuccessStatus.INCOMPLETE:
@@ -86,18 +87,9 @@ def slint_grade_from_grade(grade: Grade):
         mistakes=slint.ListModel(mistakes)
     )
 
-# def slint_input_from_input(input:InputData):
-
-#     return SlintSIInputData (
-#         card_id= int,
-#         start_time= time.strftime("%H:%M:%S", input.start_time) if input.start_time else None,
-#         finish_time= time.strftime("%H:%M:%S", input.finish_time),
-#         punches= [int]
-#     )
-
 
 # define the connection to the main window
-class App(AppWindow):
+class AppWindowPy(AppWindow):
     # CONSTRUCTOR
     @classmethod
     def default(cls) -> Self:
@@ -116,7 +108,7 @@ class App(AppWindow):
         app = cls.default()
 
         app._serial_interface = serial_interface
-
+        # this repeats default but whatever
         app.request_update_ports()
         app.request_update_time()
         app.score_mode_options = slint.ListModel(['Animal-O']) # TODO: un-hardcode
@@ -125,6 +117,7 @@ class App(AppWindow):
 
 
     # PYTHON-ONLY STATE
+    # everything that doesnt have an underscore should be a slint property
     _si_reader: SIReaderReadout | MockSIReader | None = None
     _serial_interface: SerialInterface
     _input_data: InputData | None
@@ -180,7 +173,6 @@ class App(AppWindow):
         if self._si_reader is None:
             return
 
-        # TODO: This really might need to be async. won't know without hardware
         if not self._si_reader.poll_sicard():
             return
 
@@ -216,9 +208,6 @@ class App(AppWindow):
         slint_grade = slint_grade_from_grade(runner_grade)
         self.grade = slint_grade
 
-        # import code
-        # code.interact(local=locals(), local_exit=False)
-
     def _make_sound(self, grade:Grade):
         sound_path = Path(__file__).parent / 'ui' / 'resources' / 'sounds'
         if grade.status == SuccessStatus.SUCCESS:
@@ -244,8 +233,6 @@ class App(AppWindow):
         return array.list.index(value) if value in array.list else -1
 
 
-
-
 # define a serial interface, that can be implemented by bare python or by the datastructure attached to the mock controller window
 class SerialInterface(Protocol):
     def get_port_list(self) -> list[ListPortInfo]:
@@ -265,15 +252,15 @@ class ConcreteSerialInterface(SerialInterface):
         return SIReaderReadout(port)
 
 # crazy person serial interactions
-
 class MockSIReader:
     insert_flag = False
 
     def poll_sicard(self) -> bool:
+        # true on state changes, else false
+
         if self.insert_flag:
             self.insert_flag = False
             return True
-        # true on state changes, else false
         return False
 
     def read_sicard(self) -> dict:
@@ -283,7 +270,7 @@ class MockSIReader:
             "finish": 0,
             "check": 0,
             "clear": 0,
-            "punches": [(33, "1pm")],
+            "punches": [(33, "1pm")], # TODO: pull these from the mock window
         }
 
     def disconnect(self):
@@ -321,7 +308,6 @@ class MockWindowPy(MockWindow, SerialInterface):
         self.mock_si_reader.insert_flag = True
 
 
-
 @click.command
 @click.option("--mock", is_flag=True)
 def main(mock: bool):
@@ -334,7 +320,7 @@ def main(mock: bool):
     else:
         serial_interface = ConcreteSerialInterface()
 
-    app = App.from_serial_interface(serial_interface)
+    app = AppWindowPy.from_serial_interface(serial_interface)
     app.show()
 
     # NOTE: you can also define a timer separate from / not owned by the app object
@@ -344,7 +330,7 @@ def main(mock: bool):
     # debug_timer = slint.Timer()
     # debug_timer.single_shot(timedelta(seconds=1), mess_up_ports)
 
-    # potentially: make a coroutine for polling the SI reader here
+    # NOTE: make a coroutine for polling the SI reader here
     async def main_receiver() -> None:
         result = await asyncio.sleep(0.5, result="hello")
         print(f"{result} from coroutine")
