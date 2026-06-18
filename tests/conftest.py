@@ -1,5 +1,5 @@
 from __future__ import annotations
-from easysnec.utils.grading import OutputData, SuccessStatus, Course, InputData
+from easysnec.grading import OutputData, SuccessStatus, Course, InputData
 
 import datetime as dt
 import pytest

@@ -1,0 +1,127 @@
+import { AboutSlint, VerticalBox, Button, ComboBox, ListView } from "std-widgets.slint";
+import { HorizontalDivider } from "material-1.0/ui/components/divider.slint";
+import {Grade, Mistake, ResultType, MistakeType} from "datatypes.slint";
+
+
+component MistakeDisplay inherits Text {
+    in property<Mistake> mistake;
+
+    states [
+        missing when mistake.type == MistakeType.missed: {
+            text: "Missed Checkpoint \{mistake.checkpoint}!";
+        }
+
+        // [TODO]: why???? this should work with mistake.type == MistakeType.no_finish etc, but does not
+        no_start when mistake.checkpoint == -1: {
+            text: "Missed Start";
+        }
+        no_finish when mistake.checkpoint == -2: {
+            text: "Missed Finish";
+        }
+    ]
+
+
+    vertical-alignment: TextVerticalAlignment.center;
+    horizontal-alignment: TextHorizontalAlignment.center;
+
+    font-size: 17px;
+    height: 40px;
+}
+
+export component RunningWindow inherits Rectangle {
+    // the default is useful for the slint viewer, and otherwise discarded
+    in property <Grade> grade: {
+        course: "dog",
+        result: "success",
+        time: "now",
+        mistakes:[
+            {checkpoint:1, type: MistakeType.missed},
+            {checkpoint:2, type: MistakeType.missed},
+            {checkpoint:3, type: MistakeType.missed},
+            {checkpoint:4, type: MistakeType.missed},
+            {checkpoint:5, type: MistakeType.missed},
+        ],
+    };
+    in property <[string]> courses;
+
+    callback request-return-to-settings;
+    callback request-regrade(course:string);
+
+    changed courses => {
+        course-dropdown.current-index = 0;
+        course-dropdown.current-value = courses[0];
+    }
+
+    HorizontalLayout {
+        VerticalBox {
+            padding: 10px;
+            spacing: 8px;
+            HorizontalLayout{
+                spacing: 10px;
+                Text {
+                    text: "Course";
+                    vertical-alignment: TextVerticalAlignment.center;
+                }
+                course-dropdown := ComboBox {
+                    model: courses;
+                    changed current-value => {
+                        request_regrade(self.current_value)
+                    }
+                }
+            }
+
+            HorizontalDivider { }
+
+            ListView {
+                for item[index] in grade.mistakes: MistakeDisplay { mistake:item; }
+            }
+        }
+
+        VerticalBox {
+            horizontal-stretch: 1;
+            preferred-width: 100%;
+            response_image:= Image {
+                image-fit: ImageFit.contain;
+            }
+            VerticalBox {
+                alignment: LayoutAlignment.start;
+
+                if !grade.time.is-empty: Text {
+                    font-size: 40px;
+                    horizontal-alignment: TextHorizontalAlignment.center;
+                    text: "Time: \{grade.time}";
+                }
+                response_text := Text {
+                    font-size: 40px;
+                    horizontal-alignment: TextHorizontalAlignment.center;
+                }
+            }
+
+            states [
+                success when grade.result == "success": {
+                    response_image.source: @image-url("resources/YayFace2.png");
+                    response_text.text: "Good job!";
+                }
+                incomplete when grade.result == "misses": {
+                    response_image.source: @image-url("resources/TryAgainFace2.png");
+                    response_text.text: "Almost there!";
+                }
+                fail when grade.result == "incomplete": {
+                    response_text.text: "Try Again!";
+                    response_image.source: @image-url("resources/OopsFace2.png");
+                }
+            ]
+        }
+    }
+
+    VerticalBox {
+        alignment: LayoutAlignment.end;
+        HorizontalLayout {
+            alignment: LayoutAlignment.end;
+            Button {
+                text: "Return to setup";
+                clicked => { request-return-to-settings(); }
+            }
+        }
+    }
+}

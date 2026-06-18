@@ -3,16 +3,18 @@ name = "easysnec"
 version = "0.1.1"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 
 # ------------- RUN
 dependencies = [
     "pyserial>=3.5",
-    "pyside6>=6.9.2",
     "sireader>=1.1.3",
     "sportident>=1.2.8",
     "pyxdameraulevenshtein>=1.9.0",
     "pydantic>=2.12.3",
+    "slint>=1.9.2",
+    "click>=8.3.3",
+    "playsound3>=3.3.1",
 ]
 [project.scripts]
 easysnec = "easysnec.app:main"

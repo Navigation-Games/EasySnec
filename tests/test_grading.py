@@ -1,6 +1,6 @@
 from __future__ import annotations
 import datetime as dt
-from easysnec.utils.grading import InputData, Grade, Course, SuccessStatus, ScoreType
+from easysnec.grading import InputData, Grade, Course, SuccessStatus, ScoreType
 import uuid
 import pytest
 

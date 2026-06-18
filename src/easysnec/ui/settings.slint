@@ -1,0 +1,126 @@
+import { AboutSlint, VerticalBox,HorizontalBox, StandardButton, ComboBox, Button } from "std-widgets.slint";
+import { Utils } from "datatypes.slint";
+
+export component SettingsWindow inherits VerticalLayout {
+    in property <bool> si_connected;
+    in property <bool> feature_flag_course_sets;
+
+    callback request-start;
+    callback request-connect-si(port:string);
+
+    in property <[string]> available_ports;
+    changed available_ports => {
+        // [TODO]: consider moving this function into a callback inside of the dropdown itself, once I figure out how to do that.
+        // actually, all my dropdowns should do this...
+
+        let old_port = port_dropdown.current-value;
+        port_dropdown.model = available_ports;
+
+        // callback to python bc slint doesnt have for loops
+        let new_index = Utils.find(available_ports, old_port);
+
+        if new_index < 0 {
+            port_dropdown.current-index = 0;
+            port_dropdown.current-value = "";
+            // [TODO]: send changed event (only in this case should we send an onchanged event)
+        } else {
+            port_dropdown.current-index = new_index;
+            port_dropdown.current-value = old_port;
+            // [TODO]: ensure that the above causes no changed events
+        }
+    }
+
+    out property <string> score_mode: score_mode_dropdown.current-value;
+    in property <[string]> score_mode_options: ["Animal-O", "Score-O", "Classic-O"];
+
+
+    states [
+        ready when si_connected: {
+            big_message.text: "You're connected. Press START to begin";
+            start_button.enabled: true;
+        }
+
+        not-ready when !si_connected: {
+            big_message.text: "Connect reader and select port to get started";
+            start_button.enabled: false;
+        }
+    ]
+
+
+    big_message := Text {
+        font-size: 17pt;
+        horizontal-alignment: TextHorizontalAlignment.center;
+        vertical-alignment: TextVerticalAlignment.center;
+    }
+
+    footer := Rectangle {
+        background: #313131;
+        height: 40px;
+        HorizontalBox {
+            footer_left := HorizontalLayout {
+                alignment: LayoutAlignment.start;
+                spacing: 25px;
+
+                HorizontalLayout {
+                    spacing: 10px;
+                    Text {
+                        text: "Port:";
+                        vertical-alignment: TextVerticalAlignment.center;
+                    }
+                    port_dropdown := ComboBox {
+                        property <string> previous-value;
+                        property <bool> disable-callback;
+
+                        init => {
+                            self.model = available_ports;
+                            previous-value = self.current-value;
+                        }
+
+                        changed current-value => {
+                            // if previous-value != self.current-value {
+                            // if !disable-callback {
+                            request-connect-si(self.current-value);
+                            // }
+                            previous-value = self.current-value;
+                            // }
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 10px;
+                    Text {
+                        text: "Scoring Mode:";
+                        vertical-alignment: TextVerticalAlignment.center;
+                    }
+                    score_mode_dropdown := ComboBox {
+                        model: score_mode_options;
+                    }
+                }
+
+                if feature_flag_course_sets: HorizontalLayout {
+                    spacing: 10px;
+                    Text {
+                        text: "Course Set:";
+                        vertical-alignment: TextVerticalAlignment.center;
+                    }
+                    course_set_dropdown := ComboBox {
+                        model: ["builtins"];
+                    }
+                }
+            }
+
+
+            footer_right := HorizontalLayout {
+                alignment: LayoutAlignment.end;
+
+                start_button := Button {
+                    text: "Start";
+                    enabled: false;
+                    clicked => {
+                        request-start();
+                    }
+                }
+            }
+        }
+    }
+}

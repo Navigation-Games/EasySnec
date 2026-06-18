@@ -1,0 +1,28 @@
+export struct Course {
+    name: string,
+    checkpoints: [int]
+}
+
+export enum MistakeType {missed, shuffle, no-start, no-finish}
+export enum ResultType {success, fail} // might need more options
+
+export struct Mistake {
+    type: MistakeType,
+    checkpoint: int,
+}
+export struct Grade {
+    mistakes: [Mistake],
+    result: string,
+    course: string,
+    time: string,
+}
+
+export enum GuiState {
+    settings,running,editor
+}
+
+// namespace for shared functions that slint doesnt have, for whatever reason
+// unfortunately these are typed.
+export global Utils {
+    pure callback find(array:[string], value: string) -> int;
+}

@@ -1,0 +1,71 @@
+import { AboutSlint, VerticalBox, LineEdit, GroupBox, CheckBox, HorizontalBox, Button } from "std-widgets.slint";
+// import { AppWindow } from "app_window.slint";
+
+export component MockSIController inherits Window {
+    in-out property <bool> si_reader_connection_status: false;
+    in-out property <bool> si_reader_insertion_status: false;
+    in-out property <string> si_reader_port: "COM5";
+
+    callback si_card_inserted;
+    callback si_card_removed;
+    callback si_reader_connected;
+    callback si_reader_disconnected;
+
+    changed si_reader_connection_status => {
+        if si_reader_connection_status {
+            si_reader_connected();
+        } else {
+            si_reader_disconnected();
+        }
+    }
+
+    changed si_reader_insertion_status => {
+        if si_reader_insertion_status {
+            si_card_inserted();
+        } else {
+            si_card_removed();
+        }
+    }
+
+    VerticalBox {
+        alignment: LayoutAlignment.start;
+        GroupBox {
+            enabled: true;
+            title: "USB";
+            visible: true;
+            VerticalBox {
+                alignment: LayoutAlignment.start;
+                CheckBox { text: "Connected"; checked <=> si_reader_connection_status ;}
+
+                HorizontalLayout {
+
+                    Text {
+                        vertical-alignment: center;
+                        text: "Port Name: ";
+                    }
+                    LineEdit {
+                        text: si_reader_port;
+                    }
+                }
+            }
+        }
+
+        GroupBox {
+            title: "Readout";
+            VerticalBox {
+                alignment: LayoutAlignment.start;
+
+                // [TODO]: currently this goes nowhere. We also need times for each of entry!
+                LineEdit {
+                    placeholder-text: "1, 2, 3";
+                }
+
+                HorizontalBox {
+                    Button { text: "Insert";   changed pressed => { si_reader_insertion_status = self.pressed; } }
+                    Button { text: "Leave Inserted"; clicked => { si_reader_insertion_status = true; } }
+                    Button { text: "Remove"; clicked => { si_reader_insertion_status = false;} }
+                }
+            }
+        }
+    }
+}
