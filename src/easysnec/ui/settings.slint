@@ -30,7 +30,7 @@ export component SettingsWindow inherits VerticalLayout {
         }
     }
 
-    out property <string> score_mode: score_mode_dropdown.current-value;
+    // out property <string> score_mode: score_mode_dropdown.current-value;
     in property <[string]> score_mode_options: ["Animal-O", "Score-O", "Classic-O"];
 
 
@@ -86,16 +86,16 @@ export component SettingsWindow inherits VerticalLayout {
                         }
                     }
                 }
-                HorizontalLayout {
-                    spacing: 10px;
-                    Text {
-                        text: "Scoring Mode:";
-                        vertical-alignment: TextVerticalAlignment.center;
-                    }
-                    score_mode_dropdown := ComboBox {
-                        model: score_mode_options;
-                    }
-                }
+                // HorizontalLayout {
+                //     spacing: 10px;
+                //     Text {
+                //         text: "Scoring Mode:";
+                //         vertical-alignment: TextVerticalAlignment.center;
+                //     }
+                //     score_mode_dropdown := ComboBox {
+                //         model: score_mode_options;
+                //     }
+                // }
 
                 if feature_flag_course_sets: HorizontalLayout {
                     spacing: 10px;

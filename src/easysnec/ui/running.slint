@@ -12,10 +12,10 @@ component MistakeDisplay inherits Text {
         }
 
         // [TODO]: why???? this should work with mistake.type == MistakeType.no_finish etc, but does not
-        no_start when mistake.checkpoint == -1: {
+        no-start when mistake.checkpoint == -1: {
             text: "Missed Start";
         }
-        no_finish when mistake.checkpoint == -2: {
+        no-finish when mistake.checkpoint == -2: {
             text: "Missed Finish";
         }
     ]
@@ -24,8 +24,8 @@ component MistakeDisplay inherits Text {
     vertical-alignment: TextVerticalAlignment.center;
     horizontal-alignment: TextHorizontalAlignment.center;
 
-    font-size: 17px;
-    height: 40px;
+    font-size: 27pt;
+    height: 50px;
 }
 
 export component RunningWindow inherits Rectangle {
@@ -61,6 +61,7 @@ export component RunningWindow inherits Rectangle {
                 Text {
                     text: "Course";
                     vertical-alignment: TextVerticalAlignment.center;
+                    font-size: 25pt;
                 }
                 course-dropdown := ComboBox {
                     model: courses;
@@ -87,12 +88,12 @@ export component RunningWindow inherits Rectangle {
                 alignment: LayoutAlignment.start;
 
                 if !grade.time.is-empty: Text {
-                    font-size: 40px;
+                    font-size: 35pt;
                     horizontal-alignment: TextHorizontalAlignment.center;
                     text: "Time: \{grade.time}";
                 }
                 response_text := Text {
-                    font-size: 40px;
+                    font-size: 35pt;
                     horizontal-alignment: TextHorizontalAlignment.center;
                 }
             }
