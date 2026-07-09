@@ -94,12 +94,12 @@ export component AppWindow inherits Window {
                     alignment: LayoutAlignment.end;
                     horizontal-stretch: 1;
                     preferred-width: 100%;
-                    Text {
-                        font-size: 11pt;
-                        overflow: TextOverflow.clip;
-                        text: root.time;
-                        vertical-alignment: TextVerticalAlignment.center;
-                    }
+                    // Text {
+                    //     font-size: 11pt;
+                    //     overflow: TextOverflow.clip;
+                    //     text: root.time;
+                    //     vertical-alignment: TextVerticalAlignment.center;
+                    // }
                 }
 
             }
@@ -114,7 +114,7 @@ export component AppWindow inherits Window {
             request-start => {root.guiState = GuiState.running}
 
             score_mode_options: score_mode_options;
-            changed score_mode => { root.score_mode = self.score_mode; };
+            // changed score_mode => { root.score_mode = self.score_mode; };
         }
         if guiState == GuiState.running: RunningWindow {
             grade:grade;

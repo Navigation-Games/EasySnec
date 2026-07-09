@@ -12,10 +12,10 @@ component MistakeDisplay inherits Text {
         }
 
         // [TODO]: why???? this should work with mistake.type == MistakeType.no_finish etc, but does not
-        no_start when mistake.checkpoint == -1: {
+        no-start when mistake.checkpoint == -1: {
             text: "Missed Start";
         }
-        no_finish when mistake.checkpoint == -2: {
+        no-finish when mistake.checkpoint == -2: {
             text: "Missed Finish";
         }
     ]
@@ -24,8 +24,8 @@ component MistakeDisplay inherits Text {
     vertical-alignment: TextVerticalAlignment.center;
     horizontal-alignment: TextHorizontalAlignment.center;
 
-    font-size: 17px;
-    height: 40px;
+    font-size: 40pt;
+    height: 80px;
 }
 
 export component RunningWindow inherits Rectangle {
@@ -42,6 +42,9 @@ export component RunningWindow inherits Rectangle {
             {checkpoint:5, type: MistakeType.missed},
         ],
     };
+
+    // height: 900px;
+    // width: 1400px;
     in property <[string]> courses;
 
     callback request-return-to-settings;
@@ -59,8 +62,9 @@ export component RunningWindow inherits Rectangle {
             HorizontalLayout{
                 spacing: 10px;
                 Text {
-                    text: "Course";
+                    text: "Course: ";
                     vertical-alignment: TextVerticalAlignment.center;
+                    font-size: 25pt;
                 }
                 course-dropdown := ComboBox {
                     model: courses;
@@ -87,28 +91,28 @@ export component RunningWindow inherits Rectangle {
                 alignment: LayoutAlignment.start;
 
                 if !grade.time.is-empty: Text {
-                    font-size: 40px;
+                    font-size: 40pt;
                     horizontal-alignment: TextHorizontalAlignment.center;
                     text: "Time: \{grade.time}";
                 }
                 response_text := Text {
-                    font-size: 40px;
+                    font-size: 40pt;
                     horizontal-alignment: TextHorizontalAlignment.center;
                 }
             }
 
             states [
                 success when grade.result == "success": {
-                    response_image.source: @image-url("resources/YayFace2.png");
+                    response_image.source: @image-url("resources/YayFace.png");
                     response_text.text: "Good job!";
                 }
                 incomplete when grade.result == "misses": {
-                    response_image.source: @image-url("resources/TryAgainFace2.png");
+                    response_image.source: @image-url("resources/TryAgainFace.png");
                     response_text.text: "Almost there!";
                 }
                 fail when grade.result == "incomplete": {
                     response_text.text: "Try Again!";
-                    response_image.source: @image-url("resources/OopsFace2.png");
+                    response_image.source: @image-url("resources/OopsFace.png");
                 }
             ]
         }
