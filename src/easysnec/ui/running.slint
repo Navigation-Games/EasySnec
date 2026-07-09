@@ -1,5 +1,5 @@
 import { AboutSlint, VerticalBox, Button, ComboBox, ListView } from "std-widgets.slint";
-import { HorizontalDivider } from "material-1.0/ui/components/divider.slint";
+import { HorizontalDivider, OutlineButton } from "components.slint";
 import {Grade, Mistake, ResultType, MistakeType} from "datatypes.slint";
 
 
@@ -122,7 +122,7 @@ export component RunningWindow inherits Rectangle {
         alignment: LayoutAlignment.end;
         HorizontalLayout {
             alignment: LayoutAlignment.end;
-            Button {
+            OutlineButton {
                 text: "Return to setup";
                 clicked => { request-return-to-settings(); }
             }
