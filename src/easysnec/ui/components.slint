@@ -1,0 +1,81 @@
+// Small themed widgets, taken almost verbatim from the material-1.0 ui resources
+import { Theme } from "theme.slint";
+
+export component HorizontalDivider inherits Rectangle {
+    height: 1px;
+    background: Theme.divider;
+}
+
+// Pill-shaped button filled with the brand orange, for primary actions.
+export component FilledButton inherits Rectangle {
+    in property <string> text <=> label.text;
+    in property <bool> enabled: true;
+    callback clicked <=> ta.clicked;
+
+    border-radius: self.height / 2;
+    background: !root.enabled ? Theme.disabled_bg
+        : ta.pressed ? Theme.navgames_orange.darker(20%)
+        : ta.has-hover ? Theme.navgames_orange.darker(10%)
+        : Theme.navgames_orange;
+
+    accessible-role: button;
+    accessible-enabled: root.enabled;
+    accessible-label: root.text;
+    accessible-action-default => { ta.clicked(); }
+
+    // Comfortable pill height when unconstrained; in a tight container the
+    // text keeps the full height instead of losing it to fixed padding.
+    min-height: label.preferred-height + 12px;
+
+    HorizontalLayout {
+        padding-left: 16px;
+        padding-right: 16px;
+        label := Text {
+            color: root.enabled ? white : Theme.disabled_text;
+            font-weight: 600;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: root.enabled;
+    }
+}
+
+// Pill-shaped outlined button with brand-orange text, for secondary actions.
+export component OutlineButton inherits Rectangle {
+    in property <string> text <=> label.text;
+    in property <bool> enabled: true;
+    callback clicked <=> ta.clicked;
+
+    border-radius: self.height / 2;
+    border-width: 1px;
+    border-color: root.enabled ? Theme.outline : Theme.disabled_bg;
+    background: !ta.enabled ? transparent
+        : ta.pressed ? Theme.navgames_orange.with_alpha(15%)
+        : ta.has-hover ? Theme.navgames_orange.with_alpha(8%)
+        : transparent;
+
+    accessible-role: button;
+    accessible-enabled: root.enabled;
+    accessible-label: root.text;
+    accessible-action-default => { ta.clicked(); }
+
+    min-height: label.preferred-height + 12px;
+
+    HorizontalLayout {
+        padding-left: 16px;
+        padding-right: 16px;
+        label := Text {
+            color: root.enabled ? Theme.navgames_orange : Theme.disabled_text;
+            font-weight: 600;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: root.enabled;
+    }
+}
