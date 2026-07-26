@@ -103,16 +103,19 @@ export component RunningWindow inherits Rectangle {
 
             states [
                 success when grade.result == "success": {
-                    response_image.source: @image-url("resources/YayFace.png");
+                    response_image.source: @image-url("resources/party-popper.png");
+                    // response_image.source: @image-url("resources/YayFace.png");
                     response_text.text: "Good job!";
                 }
                 incomplete when grade.result == "misses": {
-                    response_image.source: @image-url("resources/TryAgainFace.png");
+                    response_image.source: @image-url("resources/melting-face.png");
+                    // response_image.source: @image-url("resources/TryAgainFace.png");
                     response_text.text: "Almost there!";
                 }
                 fail when grade.result == "incomplete": {
                     response_text.text: "Try Again!";
-                    response_image.source: @image-url("resources/OopsFace.png");
+                    response_image.source: @image-url("resources/melting-face.png");
+                    // response_image.source: @image-url("resources/OopsFace.png");
                 }
             ]
         }
