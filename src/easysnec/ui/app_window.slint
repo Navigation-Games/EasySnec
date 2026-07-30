@@ -1,4 +1,5 @@
-import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { Button, VerticalBox, HorizontalBox, Palette } from "std-widgets.slint";
+import { Theme } from "theme.slint";
 import { SettingsWindow } from "settings.slint";
 import { RunningWindow } from "running.slint";
 import { CourseEditor } from "course_editor.slint";
@@ -31,6 +32,11 @@ export component AppWindow inherits Window {
     // internal properties
     property<GuiState> guiState: GuiState.settings;
 
+    init => {
+        // force the light theme regardless of the system color scheme
+        Palette.color-scheme = ColorScheme.light;
+    }
+
     time_refresh_timer := Timer {
         running: guiState == GuiState.settings;
         interval: 1s;
@@ -49,14 +55,9 @@ export component AppWindow inherits Window {
         triggered => { request-check-si() }
     }
 
-    // [TODO]: pretty colors!
-    // property var navgames_blue: "#0090f8"
-    // property var navgames_orange: "#ff683a"
-    // property var success_green: "#9AE99D"
-    // property var info_blue: "#CBD9FF"
-    // property var bad_red: "#FF9090"
-    // property var header_bg_color: isDarkMode ? "#222222" : "#DFDFDF"
-    // property var text_color: isDarkMode ? "#B3B3B3" : "#444444"
+    title: "EasyGec";
+
+    background: Theme.window_bg;
 
     preferred-height: 480px;
     preferred-width: 640px;
@@ -66,11 +67,19 @@ export component AppWindow inherits Window {
 
     VerticalLayout {
         header := Rectangle {
-            background: #313131;
+            background: Theme.chrome_bg;
             drop-shadow-blur: 2px;
-            drop-shadow-color: #000000;
+            drop-shadow-color: Theme.chrome_shadow;
             // [TODO]: parametrize, or make implicit from children
             height: 40px;
+
+            // brand accent line along the bottom edge
+            Rectangle {
+                y: parent.height - self.height;
+                height: 2px;
+                width: 100%;
+                background: Theme.chrome_accent;
+            }
 
             HorizontalBox {
 
@@ -95,6 +104,7 @@ export component AppWindow inherits Window {
                     horizontal-stretch: 1;
                     preferred-width: 100%;
                     // Text {
+                        color: Theme.chrome_text;
                     //     font-size: 11pt;
                     //     overflow: TextOverflow.clip;
                     //     text: root.time;

@@ -1,5 +1,7 @@
 import { AboutSlint, VerticalBox,HorizontalBox, StandardButton, ComboBox, Button } from "std-widgets.slint";
+import { FilledButton } from "components.slint";
 import { Utils } from "datatypes.slint";
+import { Theme } from "theme.slint";
 
 export component SettingsWindow inherits VerticalLayout {
     in property <bool> si_connected;
@@ -54,8 +56,18 @@ export component SettingsWindow inherits VerticalLayout {
     }
 
     footer := Rectangle {
-        background: #313131;
+        background: Theme.chrome_bg;
+        drop-shadow-blur: 2px;
+        drop-shadow-color: Theme.chrome_shadow;
         height: 40px;
+
+        Rectangle {
+            y: 0;
+            height: 2px;
+            width: 100%;
+            background: Theme.chrome_accent;
+        }
+
         HorizontalBox {
             footer_left := HorizontalLayout {
                 alignment: LayoutAlignment.start;
@@ -64,6 +76,7 @@ export component SettingsWindow inherits VerticalLayout {
                 HorizontalLayout {
                     spacing: 10px;
                     Text {
+                        color: Theme.chrome_text;
                         text: "Port:";
                         vertical-alignment: TextVerticalAlignment.center;
                     }
@@ -89,6 +102,7 @@ export component SettingsWindow inherits VerticalLayout {
                 // HorizontalLayout {
                 //     spacing: 10px;
                 //     Text {
+                        color: Theme.chrome_text;
                 //         text: "Scoring Mode:";
                 //         vertical-alignment: TextVerticalAlignment.center;
                 //     }
@@ -100,6 +114,7 @@ export component SettingsWindow inherits VerticalLayout {
                 if feature_flag_course_sets: HorizontalLayout {
                     spacing: 10px;
                     Text {
+                        color: Theme.chrome_text;
                         text: "Course Set:";
                         vertical-alignment: TextVerticalAlignment.center;
                     }
@@ -113,7 +128,7 @@ export component SettingsWindow inherits VerticalLayout {
             footer_right := HorizontalLayout {
                 alignment: LayoutAlignment.end;
 
-                start_button := Button {
+                start_button := FilledButton {
                     text: "Start";
                     enabled: false;
                     clicked => {
