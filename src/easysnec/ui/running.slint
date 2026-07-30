@@ -18,6 +18,9 @@ component MistakeDisplay inherits Text {
         no-finish when mistake.checkpoint == -2: {
             text: "Missed Finish";
         }
+        shuffle when mistake.checkpoint == -3: {
+            text: "Out of Order";
+        }
     ]
 
 
@@ -56,7 +59,9 @@ export component RunningWindow inherits Rectangle {
     }
 
     HorizontalLayout {
+        alignment: LayoutAlignment.stretch;
         VerticalBox {
+            horizontal-stretch: 0.5;
             padding: 10px;
             spacing: 8px;
             HorizontalLayout{
@@ -82,8 +87,8 @@ export component RunningWindow inherits Rectangle {
         }
 
         VerticalBox {
-            horizontal-stretch: 1;
-            preferred-width: 100%;
+            horizontal-stretch: 0.5;
+            preferred-width: 200px;
             response_image:= Image {
                 image-fit: ImageFit.contain;
             }
