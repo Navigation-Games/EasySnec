@@ -70,7 +70,9 @@ class InputData:
             ),
         )
 
-    def score_against(self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O) -> Grade:
+    def score_against(
+        self, course: Course, score_type: ScoreType = ScoreType.ANIMAL_O
+    ) -> Grade:
         return Grade(self, course, score_type)
 
 
@@ -142,7 +144,7 @@ class Grade:
     def missed_checkpoint_indices(self) -> list[int]:
         return [
             index
-            for index,station in enumerate(self.course.stations)
+            for index, station in enumerate(self.course.stations)
             if station not in self.input_data.stations
         ]
 

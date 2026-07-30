@@ -21,8 +21,6 @@ from easysnec.grading import InputData, COURSES, ScoreType, Grade, Course, Succe
 logger = logging.getLogger(__name__)
 
 
-
-
 # Load the slint entry-points
 try:
     loader = slint.loader.easysnec.ui
@@ -45,24 +43,33 @@ except slint.CompileError as e:
 def slint_grade_from_grade(grade: Grade):
 
     mistakes = [
-        SlintMistake(
-            checkpoint=c+1,
-            type = SlintMistakeType.missed
-        )
+        SlintMistake(checkpoint=c + 1, type=SlintMistakeType.missed)
         for c in grade.missed_checkpoint_indices
     ]
 
     if not grade.input_data.start_time:
-        mistakes.insert(0, SlintMistake(
-            checkpoint=-1, # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
-            type = SlintMistakeType.no_start
-        ))
+        mistakes.insert(
+            0,
+            SlintMistake(
+                checkpoint=-1,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
+                type=SlintMistakeType.no_start,
+            ),
+        )
     if not grade.input_data.finish_time:
-        mistakes.append(SlintMistake(
-            checkpoint=-2, # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
-            type = SlintMistakeType.no_finish
-        ))
+        mistakes.append(
+            SlintMistake(
+                checkpoint=-2,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
+                type=SlintMistakeType.no_finish,
+            )
+        )
 
+    if (
+        grade.status != SuccessStatus.SUCCESS
+        and len(grade.missed_checkpoint_indices) == 0
+        and grade.input_data.start_time
+        and grade.input_data.finish_time
+    ):
+        mistakes.append(SlintMistake(checkpoint=-3, type=SlintMistakeType.shuffle))
 
     # TODO: There ought to be some sort of mapping from slint's enums to ours
     if grade.status == SuccessStatus.SUCCESS:
@@ -75,16 +82,16 @@ def slint_grade_from_grade(grade: Grade):
     if not grade.input_data.start_time or not grade.input_data.finish_time:
         time_text = ""
     else:
-        time_delta = (grade.input_data.finish_time-grade.input_data.start_time)
-        minutes = int(time_delta.seconds/60)
-        seconds = time_delta.seconds%60
+        time_delta = grade.input_data.finish_time - grade.input_data.start_time
+        minutes = int(time_delta.seconds / 60)
+        seconds = time_delta.seconds % 60
         time_text = f"{minutes:02}:{seconds:02}"
 
     return SlintGrade(
         course=grade.course.course_name,
         result=status,
         time=time_text,
-        mistakes=slint.ListModel(mistakes)
+        mistakes=slint.ListModel(mistakes),
     )
 
 
@@ -102,19 +109,17 @@ class AppWindowPy(AppWindow):
 
         return app
 
-
     @classmethod
-    def from_serial_interface(cls, serial_interface:SerialInterface) -> Self:
+    def from_serial_interface(cls, serial_interface: SerialInterface) -> Self:
         app = cls.default()
 
         app._serial_interface = serial_interface
         # this repeats default but whatever
         app.request_update_ports()
         app.request_update_time()
-        app.score_mode_options = slint.ListModel(['Animal-O']) # TODO: un-hardcode
+        app.score_mode_options = slint.ListModel(["Animal-O"])  # TODO: un-hardcode
 
         return app
-
 
     # PYTHON-ONLY STATE
     # everything that doesnt have an underscore should be a slint property
@@ -194,12 +199,12 @@ class AppWindowPy(AppWindow):
             # this exception (card removed too early) can be ignored
             logger.warning(f"exception: {e}")
 
-
-    def _report_output(self, input:InputData, course:Course):
+    def _report_output(self, input: InputData, course: Course):
         print("grading si result...")
 
         runner_grade = input.score_against(
-            course, ScoreType.ANIMAL_O # TODO: un-hardcode
+            course,
+            ScoreType.ANIMAL_O,  # TODO: un-hardcode
         )
 
         logger.info("Correctness: " + pprint.pformat(runner_grade.status))
@@ -208,24 +213,22 @@ class AppWindowPy(AppWindow):
         slint_grade = slint_grade_from_grade(runner_grade)
         self.grade = slint_grade
 
-    def _make_sound(self, grade:Grade):
-        sound_path = Path(__file__).parent / 'ui' / 'resources' / 'sounds'
+    def _make_sound(self, grade: Grade):
+        sound_path = Path(__file__).parent / "ui" / "resources" / "sounds"
         if grade.status == SuccessStatus.SUCCESS:
-            sound_path = sound_path / 'good'
+            sound_path = sound_path / "good"
         elif grade.status == SuccessStatus.INCOMPLETE:
-            sound_path = sound_path / 'med'
+            sound_path = sound_path / "med"
         elif grade.status == SuccessStatus.MISSES:
-            sound_path = sound_path / 'bad'
+            sound_path = sound_path / "bad"
 
         all_sounds = list(sound_path.glob("*.mp3"))
         playsound3.playsound(random.choice(all_sounds), block=False)
 
-
     @slint.callback
-    def request_regrade(self, course:str):
+    def request_regrade(self, course: str):
         course_obj = next(iter(filter(lambda x: x.course_name == course, COURSES)))
         self._report_output(self._input, course_obj)
-
 
     # UTILITY FUNCTIONS
     @slint.callback(global_name="Utils")
@@ -235,21 +238,20 @@ class AppWindowPy(AppWindow):
 
 # define a serial interface, that can be implemented by bare python or by the datastructure attached to the mock controller window
 class SerialInterface(Protocol):
-    def get_port_list(self) -> list[ListPortInfo]:
-        ...
-    def bind_si_reader(self, port:str) -> SIReaderReadout | MockSIReader:
-        ...
+    def get_port_list(self) -> list[ListPortInfo]: ...
+    def bind_si_reader(self, port: str) -> SIReaderReadout | MockSIReader: ...
 
 
 # normal person serial interactions
 class ConcreteSerialInterface(SerialInterface):
     @override
     def get_port_list(self) -> list[ListPortInfo]:
-        return [port.device for port in serial.tools.list_ports.comports() ]
+        return [port.device for port in serial.tools.list_ports.comports()]
 
     @override
-    def bind_si_reader(self, port:str) -> SIReaderReadout:
+    def bind_si_reader(self, port: str) -> SIReaderReadout:
         return SIReaderReadout(port)
+
 
 # crazy person serial interactions
 class MockSIReader:
@@ -270,7 +272,7 @@ class MockSIReader:
             "finish": 0,
             "check": 0,
             "clear": 0,
-            "punches": [(33, "1pm")], # TODO: pull these from the mock window
+            "punches": [(33, "1pm")],  # TODO: pull these from the mock window
         }
 
     def disconnect(self):
@@ -287,7 +289,7 @@ class MockWindowPy(MockWindow, SerialInterface):
 
     @override
     def get_port_list(self) -> list[ListPortInfo]:
-        ports = [port.device for port in serial.tools.list_ports.comports() ]
+        ports = [port.device for port in serial.tools.list_ports.comports()]
 
         if self.si_reader_connection_status:
             ports.append(self.si_reader_port)
@@ -295,12 +297,11 @@ class MockWindowPy(MockWindow, SerialInterface):
         return ports
 
     @override
-    def bind_si_reader(self, port:str) -> SIReaderReadout | MockSIReader:
+    def bind_si_reader(self, port: str) -> SIReaderReadout | MockSIReader:
         if port != self.si_reader_port:
             raise SIReaderException()
 
         return self.mock_si_reader
-
 
     @slint.callback
     def si_card_inserted(self):
@@ -312,7 +313,6 @@ class MockWindowPy(MockWindow, SerialInterface):
 @click.option("--mock", is_flag=True)
 def main(mock: bool):
     logging.basicConfig(level=logging.INFO)
-
 
     if mock:
         serial_interface = MockWindowPy()
