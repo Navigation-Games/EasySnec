@@ -1,0 +1,1 @@
+powershell .\run_easysnec.ps1
