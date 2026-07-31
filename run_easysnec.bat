@@ -1,1 +1,3 @@
-powershell .\run_easysnec.ps1
+powershell -ExecutionPolicy ByPass .\run_easysnec.ps1
+
+timeout 5
