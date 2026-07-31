@@ -87,6 +87,7 @@ export component SettingsWindow inherits VerticalLayout {
                         init => {
                             self.model = available_ports;
                             previous-value = self.current-value;
+                            request-connect-si(self.current-value);
                         }
 
                         changed current-value => {
