@@ -126,6 +126,7 @@ class AppWindowPy(AppWindow):
     _si_reader: SIReaderReadout | MockSIReader | None = None
     _serial_interface: SerialInterface
     _input_data: InputData | None
+    _previous_all_ports: list[ListPortInfo] = []
 
     # CALLBACKS
     @slint.callback
@@ -140,15 +141,23 @@ class AppWindowPy(AppWindow):
     def request_update_ports(self) -> None:
         new_ports = self._serial_interface.get_port_list()
 
+        if set(new_ports) == set(self._previous_all_ports):
+            return
+
+        self._previous_all_ports = new_ports
+
+        # TODO: str(port) -> port.name
+        si_ports = list(filter(lambda port: self._check_port_is_si(str(port)), new_ports))
+
         old_ports = slint.models.ModelIterator(self.available_ports)
 
         # TODO: writing to properties always triggers updates in the system, even if nothing has changed. use getters/setters to do some equivalence checking?
 
         # if iter_not_the_same
         # NOTE: is it cleaner to do this with set equality?
-        if any(map(lambda pair: pair[0] != pair[1], zip_longest(new_ports, old_ports))):
+        if any(map(lambda pair: pair[0] != pair[1], zip_longest(si_ports, old_ports))):
             # actually do an update
-            self.available_ports = slint.ListModel(new_ports)
+            self.available_ports = slint.ListModel(si_ports)
 
     @slint.callback
     def display_course(self, course) -> int:
@@ -156,6 +165,15 @@ class AppWindowPy(AppWindow):
         for checkpoint in course.checkpoints:
             out += str(int(checkpoint)) + " "
         return out
+
+    def _check_port_is_si(self, port:str) -> bool:
+        print(f"checking port {port}...")
+        try:
+            _ = self._serial_interface.bind_si_reader(port)
+            print("success!")
+            return True
+        except SIReaderException:
+            return False
 
     @slint.callback
     def request_connect_si(self, port: str) -> None:
@@ -292,12 +310,12 @@ class MockWindowPy(MockWindow, SerialInterface):
         ports = [port.device for port in serial.tools.list_ports.comports()]
 
         if self.si_reader_connection_status:
-            ports.append(self.si_reader_port)
+            ports.append(self.si_reader_port) # TODO: this is not a ListPortInfo!!
 
         return ports
 
     @override
-    def bind_si_reader(self, port: str) -> SIReaderReadout | MockSIReader:
+    def bind_si_reader(self, port: str) -> MockSIReader:
         if port != self.si_reader_port:
             raise SIReaderException()
 
