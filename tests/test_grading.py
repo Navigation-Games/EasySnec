@@ -37,21 +37,21 @@ def generate_input_from_station_list(stations):
 
 def test_get_closest_course():
     COURSES = [
-        Course("Frog", False, [32, 40, 39, 38, 35, 34, 36, 37, 31, 33]),
-        Course("Octopus", False, [34, 36, 39, 40, 32, 33, 37, 38, 31, 35]),
-        Course("Penguin", False, [38, 39, 32, 34, 35, 36, 37, 33, 31, 40]),
-        Course("Sheep", False, [40, 36, 34, 31, 32, 33, 35, 37, 38, 39]),
-        Course("Lion", False, [31, 33, 36, 38, 39]),
-        Course("Dog", False, [33, 32, 40, 38, 34]),
-        Course("Bee", False, [35, 37, 38, 40, 33]),
-        Course("Bird", False, [36, 34, 31, 38, 37]),
-        Course("Elephant", False, [37, 34, 31, 40, 39]),
-        Course("Crab", False, [39, 31, 32, 35, 37]),
+        Course("Frog", [32, 40, 39, 38, 35, 34, 36, 37, 31, 33]),
+        Course("Octopus", [34, 36, 39, 40, 32, 33, 37, 38, 31, 35]),
+        Course("Penguin", [38, 39, 32, 34, 35, 36, 37, 33, 31, 40]),
+        Course("Sheep", [40, 36, 34, 31, 32, 33, 35, 37, 38, 39]),
+        Course("Lion", [31, 33, 36, 38, 39]),
+        Course("Dog", [33, 32, 40, 38, 34]),
+        Course("Bee", [35, 37, 38, 40, 33]),
+        Course("Bird", [36, 34, 31, 38, 37]),
+        Course("Elephant", [37, 34, 31, 40, 39]),
+        Course("Crab", [39, 31, 32, 35, 37]),
     ]
 
     def assert_helper(list):
         return (
-            generate_input_from_station_list(list).get_closest_course(COURSES)
+            generate_input_from_station_list(list).get_courses_sorted(COURSES)[0]
             == COURSES[9]
         )
 
