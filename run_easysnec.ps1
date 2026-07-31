@@ -1,3 +1,5 @@
+$env:PATH += "$env:USERPROFILE\.local\bin"
+
 if (Get-Command uv -errorAction SilentlyContinue) {
     uv run easysnec
 } else {
