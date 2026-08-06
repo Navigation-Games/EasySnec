@@ -3,6 +3,17 @@ import { FilledButton } from "components.slint";
 import { Utils } from "datatypes.slint";
 import { Theme } from "theme.slint";
 
+component CourseSet inherits Rectangle {
+    height: 100px;
+    width: 100px;
+
+    background: greenyellow;
+    border-radius: 10px;
+    border-color: green;
+    border-width: 5px;
+}
+
+
 export component SettingsWindow inherits VerticalLayout {
     in property <bool> si_connected;
     in property <bool> feature_flag_course_sets;
@@ -53,6 +64,15 @@ export component SettingsWindow inherits VerticalLayout {
         font-size: 17pt;
         horizontal-alignment: TextHorizontalAlignment.center;
         vertical-alignment: TextVerticalAlignment.center;
+    }
+
+    course_row := HorizontalLayout {
+        alignment: LayoutAlignment.start;
+        spacing: 50px;
+
+        CourseSet {}
+        CourseSet {}
+        CourseSet {}
     }
 
     footer := Rectangle {
