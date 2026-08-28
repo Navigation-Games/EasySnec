@@ -58,6 +58,10 @@ export component RunningWindow inherits Rectangle {
         course-dropdown.current-value = courses[0];
     }
 
+    changed grade => {
+        result-panel.pop = !result-panel.pop;
+    }
+
     HorizontalLayout {
         alignment: LayoutAlignment.stretch;
         VerticalBox {
@@ -86,11 +90,22 @@ export component RunningWindow inherits Rectangle {
             }
         }
 
-        VerticalBox {
+        result-panel := VerticalBox {
             horizontal-stretch: 0.5;
             preferred-width: 200px;
-            response_image:= Image {
-                image-fit: ImageFit.contain;
+
+            property <bool> pop: false;
+            property <float> pop-progress: pop ? 1.0 : 0.0;
+            animate pop-progress { duration: 600ms; easing: ease-in-out; }
+
+            image-holder := Rectangle {
+                vertical-stretch: 1;
+                response_image := Image {
+                    image-fit: ImageFit.contain;
+                    height: parent.height;
+                    width: parent.width * abs(1 - 2 * result-panel.pop-progress);
+                    x: (parent.width - self.width) / 2;
+                }
             }
             VerticalBox {
                 alignment: LayoutAlignment.start;
