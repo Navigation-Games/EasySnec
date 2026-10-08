@@ -58,9 +58,9 @@ export component RunningWindow inherits Rectangle {
         course-dropdown.current-value = courses[0];
     }
 
-    changed grade => {
-        result-panel.pop = !result-panel.pop;
-    }
+
+    changed grade => pop.start();
+
 
     HorizontalLayout {
         alignment: LayoutAlignment.stretch;
@@ -94,16 +94,27 @@ export component RunningWindow inherits Rectangle {
             horizontal-stretch: 0.5;
             preferred-width: 200px;
 
-            property <bool> pop: false;
-            property <float> pop-progress: pop ? 1.0 : 0.0;
-            animate pop-progress { duration: 600ms; easing: ease-in-out; }
+            property <float> pop-progress: 1.0;
+            animate pop-progress { duration: 600ms; easing: spring(0.4); }
+            pop := Timer {
+                interval: 0s;
+                triggered() => {
+                    if result-panel.pop-progress > 0.5 {
+                        result-panel.pop-progress = 0.0;
+                    } else {
+                        result-panel.pop-progress = 1.0;
+                    }
+                    self.running = false;
+                }
+            }
+
 
             image-holder := Rectangle {
                 vertical-stretch: 1;
                 response_image := Image {
                     image-fit: ImageFit.contain;
                     height: parent.height;
-                    width: parent.width * abs(1 - 2 * result-panel.pop-progress);
+                    width: parent.width * 0.9 * abs(1 - 2 * result-panel.pop-progress);
                     x: (parent.width - self.width) / 2;
                 }
             }
