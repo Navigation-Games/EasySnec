@@ -28,6 +28,11 @@ export component AppWindow inherits Window {
 
     // if a callback result will be bound to something, mark it as pure so the constraint solver doesnt perish
     pure callback display-course(course:Course) -> string;
+    changed si_connected => {
+        if !si_connected {
+            guiState = GuiState.settings;
+        }
+    }
 
     // internal properties
     property<GuiState> guiState: GuiState.settings;

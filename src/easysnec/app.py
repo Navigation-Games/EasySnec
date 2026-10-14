@@ -178,8 +178,13 @@ class AppWindowPy(AppWindow):
         if self._si_reader is None:
             return
 
-        if not self._si_reader.poll_sicard():
-            return
+
+        try:
+            if not self._si_reader.poll_sicard():
+                return
+        except OSError as e:
+            # print("THIS DOESNT WORK!")
+            self.si_connected = False
 
         try:
             self._input = InputData.from_si_result(self._si_reader.read_sicard())
