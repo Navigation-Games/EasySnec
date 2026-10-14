@@ -205,7 +205,7 @@ class AppWindowPy(AppWindow):
             logger.warning(f"exception: {e}")
 
     def _report_output(self, input: InputData, course: Course):
-        print("grading si result...")
+        # print("grading si result...")
 
         runner_grade = input.score_against(
             course,

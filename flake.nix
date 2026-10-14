@@ -1,7 +1,7 @@
 {
   # Which package repository will we point to?
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05-small";
   };
 
   outputs = { self, nixpkgs, ... }@inputs:
@@ -35,15 +35,22 @@
             nativeBuildInputs = with pkgs; [
               stdenv.cc.cc.lib
               libGL # posibly superseded by hardware.enable
+
+              # slint deps
               libx11
-              glib
+              udev
+              libinput
+              libgbm
+              freetype
+              # glib
+              # glibc
               krb5
               libxkbcommon
               dbus
               wayland
-              # needed for slint
               expat
-              # fontconfig
+              fontconfig
+
               # pkg-config
 
               alsa-lib
