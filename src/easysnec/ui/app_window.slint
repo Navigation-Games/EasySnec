@@ -16,6 +16,11 @@ export component AppWindow inherits Window {
     in property<[string]> score_mode_options;
     out property<string> score_mode;
 
+    in-out property <[{name:string, enabled:bool}]> course_sets: [
+        {name: "Cambridge Plays", enabled: true},
+        {name: "Some other thing", enabled: false}
+    ];
+
     in property <Grade> grade;
     in property <[string]> courses;
 
@@ -25,6 +30,7 @@ export component AppWindow inherits Window {
     callback request-update-ports();
     callback request-update-time();
     callback request-regrade(course:string);
+    callback request-update-course-sets(course_sets:[{name:string, enabled:bool}]);
 
     // if a callback result will be bound to something, mark it as pure so the constraint solver doesnt perish
     pure callback display-course(course:Course) -> string;
@@ -54,6 +60,7 @@ export component AppWindow inherits Window {
         triggered => { request-update-ports() }
     }
 
+    // [TODO]: move to coroutine
     si_ping_timer := Timer {
         running: guiState == GuiState.running;
         interval: 0.1s;
@@ -122,14 +129,16 @@ export component AppWindow inherits Window {
 
         if guiState == GuiState.settings: SettingsWindow {
             si_connected: si_connected;
-            feature_flag_course_sets: false;
+            course_sets: course_sets;
 
             available_ports: available_ports;
+
+            // [TODO]: it would be really nice if I could bind python functions to the file directly, instead of all this silly piping
             request-connect-si(port) => { request-connect-si(port); }
+            request-update-course-sets(course-sets) => { request-update-course-sets(course-sets); }
             request-start => {root.guiState = GuiState.running}
 
             score_mode_options: score_mode_options;
-            // changed score_mode => { root.score_mode = self.score_mode; };
         }
         if guiState == GuiState.running: RunningWindow {
             grade:grade;

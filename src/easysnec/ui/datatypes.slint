@@ -3,6 +3,11 @@ export struct Course {
     checkpoints: [int]
 }
 
+export struct CourseSet {
+    name: string,
+    enabled: bool,
+}
+
 export enum MistakeType {missed, shuffle, no-start, no-finish}
 export enum ResultType {success, fail} // might need more options
 
