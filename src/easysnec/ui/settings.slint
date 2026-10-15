@@ -1,17 +1,7 @@
-import { AboutSlint, VerticalBox,HorizontalBox, StandardButton, ComboBox, Button } from "std-widgets.slint";
+import { AboutSlint, VerticalBox, HorizontalBox, ComboBox, Button } from "std-widgets.slint";
 import { FilledButton } from "components.slint";
 import { Utils } from "datatypes.slint";
 import { Theme } from "theme.slint";
-
-component CourseSet inherits Rectangle {
-    height: 100px;
-    width: 100px;
-
-    background: greenyellow;
-    border-radius: 10px;
-    border-color: green;
-    border-width: 5px;
-}
 
 
 export component SettingsWindow inherits VerticalLayout {
@@ -20,8 +10,16 @@ export component SettingsWindow inherits VerticalLayout {
 
     callback request-start;
     callback request-connect-si(port:string);
+    callback request-update-course-sets(course_sets:[{name:string, enabled:bool}]);
 
     in property <[string]> available_ports;
+
+    in-out property <[{name:string, enabled:bool}]> course_sets: [
+        {name: "Cambridge Plays", enabled: true},
+        {name: "Some other thing", enabled: false}
+    ];
+
+
     changed available_ports => {
         // [TODO]: consider moving this function into a callback inside of the dropdown itself, once I figure out how to do that.
         // actually, all my dropdowns should do this...
@@ -66,13 +64,31 @@ export component SettingsWindow inherits VerticalLayout {
         vertical-alignment: TextVerticalAlignment.center;
     }
 
-    course_row := HorizontalLayout {
+    // [TODO] use flexboxlayout when available, in case a user has one million course sets
+    course_row := HorizontalBox {
         alignment: LayoutAlignment.start;
-        spacing: 50px;
+        padding: 25px;
+        spacing: 25px;
 
-        CourseSet {}
-        CourseSet {}
-        CourseSet {}
+        // flex-direction: row-reverse;
+        // cross-axis-alignment: end;
+        // flex-wrap: wrap-reverse;
+
+        for course-set[index] in course_sets: Button {
+            height: 100px;
+            // width: 100px;
+
+            checkable: true;
+            checked <=> course-set.enabled;
+            text: course-set.name;
+
+            // HACK; without this, the `course_sets` struct passed up to python is malformed
+            init => {
+                self.checked = !self.checked;
+                self.checked = !self.checked;
+            }
+            clicked => request-update-course-sets(course_sets);
+        }
     }
 
     footer := Rectangle {
@@ -131,18 +147,6 @@ export component SettingsWindow inherits VerticalLayout {
                 //         model: score_mode_options;
                 //     }
                 // }
-
-                if feature_flag_course_sets: HorizontalLayout {
-                    spacing: 10px;
-                    Text {
-                        color: Theme.chrome_text;
-                        text: "Course Set:";
-                        vertical-alignment: TextVerticalAlignment.center;
-                    }
-                    course_set_dropdown := ComboBox {
-                        model: ["builtins"];
-                    }
-                }
             }
 
 

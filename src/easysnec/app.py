@@ -16,12 +16,14 @@ import slint.models
 from sportident import SIReaderReadout, SIReaderException, SIReaderCardChanged
 import serial.tools.list_ports
 
-from easysnec.grading import InputData, COURSES, ScoreType, Grade, Course, SuccessStatus
+from easysnec.grading import InputData, ScoreType, Grade, SuccessStatus
+from easysnec.courses import Course, CourseManager
 
 logger = logging.getLogger(__name__)
 
 
-# Load the slint entry-points
+# Load the slint entry-points and datatypes
+# [TODO]: this feels gross. consider using slint to compile to filesystem, and import from files
 try:
     loader = slint.loader.easysnec.ui
 
@@ -30,7 +32,6 @@ try:
     SlintGrade = loader.app_window.Grade
     SlintMistake = loader.app_window.Mistake
     SlintMistakeType = loader.app_window.MistakeType
-    # SlintSIInputData = loader.app_window.SIInputData
 
 except slint.CompileError as e:
     print(e.message)
@@ -38,61 +39,6 @@ except slint.CompileError as e:
         print(d)
     print("could not compile!")
     quit(1)
-
-
-def slint_grade_from_grade(grade: Grade):
-
-    mistakes = [
-        SlintMistake(checkpoint=c + 1, type=SlintMistakeType.missed)
-        for c in grade.missed_checkpoint_indices
-    ]
-
-    if not grade.input_data.start_time:
-        mistakes.insert(
-            0,
-            SlintMistake(
-                checkpoint=-1,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
-                type=SlintMistakeType.no_start,
-            ),
-        )
-    if not grade.input_data.finish_time:
-        mistakes.append(
-            SlintMistake(
-                checkpoint=-2,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
-                type=SlintMistakeType.no_finish,
-            )
-        )
-
-    if (
-        grade.status != SuccessStatus.SUCCESS
-        and len(grade.missed_checkpoint_indices) == 0
-        and grade.input_data.start_time
-        and grade.input_data.finish_time
-    ):
-        mistakes.append(SlintMistake(checkpoint=-3, type=SlintMistakeType.shuffle))
-
-    # TODO: There ought to be some sort of mapping from slint's enums to ours
-    if grade.status == SuccessStatus.SUCCESS:
-        status = "success"
-    if grade.status == SuccessStatus.INCOMPLETE:
-        status = "incomplete"
-    if grade.status == SuccessStatus.MISSES:
-        status = "misses"
-
-    if not grade.input_data.start_time or not grade.input_data.finish_time:
-        time_text = ""
-    else:
-        time_delta = grade.input_data.finish_time - grade.input_data.start_time
-        minutes = int(time_delta.seconds / 60)
-        seconds = time_delta.seconds % 60
-        time_text = f"{minutes:02}:{seconds:02}"
-
-    return SlintGrade(
-        course=grade.course.course_name,
-        result=status,
-        time=time_text,
-        mistakes=slint.ListModel(mistakes),
-    )
 
 
 # define the connection to the main window
@@ -106,6 +52,7 @@ class AppWindowPy(AppWindow):
 
         app.request_update_ports()
         app.request_update_time()
+        app.update_course_sets()
 
         return app
 
@@ -117,6 +64,7 @@ class AppWindowPy(AppWindow):
         # this repeats default but whatever
         app.request_update_ports()
         app.request_update_time()
+        app.update_course_sets()
         app.score_mode_options = slint.ListModel(["Animal-O"])  # TODO: un-hardcode
 
         return app
@@ -126,6 +74,7 @@ class AppWindowPy(AppWindow):
     _si_reader: SIReaderReadout | MockSIReader | None = None
     _serial_interface: SerialInterface
     _input_data: InputData | None
+    _course_manager: CourseManager = CourseManager()
 
     # CALLBACKS
     @slint.callback
@@ -149,6 +98,23 @@ class AppWindowPy(AppWindow):
         if any(map(lambda pair: pair[0] != pair[1], zip_longest(new_ports, old_ports))):
             # actually do an update
             self.available_ports = slint.ListModel(new_ports)
+
+
+    def update_course_sets(self) -> None:
+        self.course_sets = slint.ListModel([
+            {
+                "name": course_set.name,
+                "enabled": course_set.enabled
+            }
+            for course_set in self._course_manager.course_sets.values()
+        ])
+    @slint.callback
+    def request_update_course_sets(self, course_sets):
+        self._course_manager.update({
+            course_set.name: course_set.enabled
+            for course_set in course_sets
+        })
+
 
     @slint.callback
     def display_course(self, course) -> int:
@@ -192,7 +158,7 @@ class AppWindowPy(AppWindow):
             # beep
             self._si_reader.ack_sicard()
 
-            courses = list(self._input.get_courses_sorted(COURSES))
+            courses = list(self._input.get_courses_sorted(  self._course_manager.get_enabled_courses()  ))
             self.courses = slint.ListModel(map(lambda x: x.course_name, courses))
 
             best_guess_course = courses[0]
@@ -205,7 +171,6 @@ class AppWindowPy(AppWindow):
             logger.warning(f"exception: {e}")
 
     def _report_output(self, input: InputData, course: Course):
-        # print("grading si result...")
 
         runner_grade = input.score_against(
             course,
@@ -215,7 +180,7 @@ class AppWindowPy(AppWindow):
         logger.info("Correctness: " + pprint.pformat(runner_grade.status))
 
         # Put stuff in the UI
-        slint_grade = slint_grade_from_grade(runner_grade)
+        slint_grade = runner_grade.to_slint(SlintGrade, SlintMistake, SlintMistakeType)
         self.grade = slint_grade
 
     def _make_sound(self, grade: Grade):
@@ -232,8 +197,9 @@ class AppWindowPy(AppWindow):
 
     @slint.callback
     def request_regrade(self, course: str):
-        course_obj = next(iter(filter(lambda x: x.course_name == course, COURSES)))
+        course_obj = next(iter(filter(lambda x: x.course_name == course,  self._course_manager.get_enabled_courses()  )))
         self._report_output(self._input, course_obj)
+
 
     # UTILITY FUNCTIONS
     @slint.callback(global_name="Utils")
@@ -258,7 +224,6 @@ class ConcreteSerialInterface(SerialInterface):
         return SIReaderReadout(port)
 
 
-# crazy person serial interactions
 class MockSIReader:
     insert_flag = False
 
@@ -288,6 +253,7 @@ class MockSIReader:
         pass  # noop
 
 
+# crazy person serial interactions
 class MockWindowPy(MockWindow, SerialInterface):
     # serial interface protocol support
     mock_si_reader = MockSIReader()
