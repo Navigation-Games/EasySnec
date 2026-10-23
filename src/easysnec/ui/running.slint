@@ -96,6 +96,7 @@ export component RunningWindow inherits Rectangle {
 
             property <float> pop-progress: 1.0;
             animate pop-progress { duration: 600ms; easing: spring(0.4); }
+            // for some reason, zero second timer works but just a raw function does not
             pop := Timer {
                 interval: 0s;
                 triggered() => {
