@@ -1,4 +1,5 @@
 from __future__ import annotations
+from tabnanny import check
 from serial.tools.list_ports_common import ListPortInfo
 from typing import override, Protocol, Self
 import asyncio
@@ -32,6 +33,7 @@ try:
     SlintGrade = loader.app_window.Grade
     SlintMistake = loader.app_window.Mistake
     SlintMistakeType = loader.app_window.MistakeType
+    SlintCourseSet = loader.app_window.CourseSet
 
 except slint.CompileError as e:
     print(e.message)
@@ -95,7 +97,7 @@ class AppWindowPy(AppWindow):
 
         # if iter_not_the_same
         # NOTE: is it cleaner to do this with set equality?
-        if any(map(lambda pair: pair[0] != pair[1], zip_longest(new_ports, old_ports))):
+        if any(pair[0] != pair[1] for pair in zip_longest(new_ports, old_ports)):
             # actually do an update
             self.available_ports = slint.ListModel(new_ports)
 
@@ -104,7 +106,12 @@ class AppWindowPy(AppWindow):
         self.course_sets = slint.ListModel([
             {
                 "name": course_set.name,
-                "enabled": course_set.enabled
+                "enabled": course_set.enabled,
+                "courses": slint.ListModel(
+                    {
+                        "name": x.course_name,
+                        "checkpoints": slint.ListModel(x.stations)
+                    } for x in course_set.courses)
             }
             for course_set in self._course_manager.course_sets.values()
         ])
@@ -122,7 +129,7 @@ class AppWindowPy(AppWindow):
         # If a scan has apready been performed, lets re-grade it
         if self._input:
             courses = list(self._input.get_courses_sorted(  self._course_manager.get_enabled_courses()  ))
-            self.courses = slint.ListModel(map(lambda x: x.course_name, courses))
+            self.courses = slint.ListModel(x.course_name for x in courses)
 
             best_guess_course = courses[0]
 
@@ -219,6 +226,20 @@ class AppWindowPy(AppWindow):
     def find(self, array: slint.ListModel, value: str) -> int:
         return array.list.index(value) if value in array.list else -1
 
+    @slint.callback(global_name="Utils")
+    def course_to_string(self, checkpoints: slint.ListModel) -> str:
+        return ",".join([str(checkpoint) for checkpoint in slint.models.ModelIterator(checkpoints)])
+
+    @slint.callback(global_name="Utils")
+    def string_to_course(self, checkpoints: str) -> slint.ListModel:
+        return slint.ListModel([int(checkpoint.strip()) for checkpoint in checkpoints.split(",")])
+
+    @slint.callback(global_name="Utils")
+    def try_update_course(self, checkpoints: slint.ListModel, update: str) -> slint.ListModel:
+        try:
+           return slint.ListModel([int(checkpoint.strip()) for checkpoint in update.split(",")])
+        except ValueError:
+            return checkpoints
 
 # define a serial interface, that can be implemented by bare python or by the datastructure attached to the mock controller window
 class SerialInterface(Protocol):
