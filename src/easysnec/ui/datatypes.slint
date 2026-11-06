@@ -25,4 +25,6 @@ export enum GuiState {
 // unfortunately these are typed.
 export global Utils {
     pure callback find(array:[string], value: string) -> int;
+    pure callback course_to_string(course: [int]) -> string;
+    pure callback string_to_course(string) -> [int];
 }

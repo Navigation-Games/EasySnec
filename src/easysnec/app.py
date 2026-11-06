@@ -240,6 +240,14 @@ class AppWindowPy(AppWindow):
     def find(self, array: slint.ListModel, value: str) -> int:
         return array.list.index(value) if value in array.list else -1
 
+    @slint.callback(global_name="Utils")
+    def course_to_string(self, checkpoints: slint.ListModel) -> str:
+        return ",".join([str(checkpoint) for checkpoint in slint.models.ModelIterator(checkpoints)])
+
+    @slint.callback(global_name="Utils")
+    def string_to_course(self, checkpoints: str) -> slint.ListModel:
+        return slint.ListModel([int(checkpoint.strip()) for checkpoint in checkpoints.split(",")])
+
 
 # define a serial interface, that can be implemented by bare python or by the datastructure attached to the mock controller window
 class SerialInterface(Protocol):
