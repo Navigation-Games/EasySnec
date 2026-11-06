@@ -30,12 +30,12 @@ export component AppWindow inherits Window {
     pure callback display-course(course:Course) -> string;
     changed si_connected => {
         if !si_connected {
-            guiState = GuiState.settings;
+            guiState = GuiState.editor;
         }
     }
 
     // internal properties
-    property<GuiState> guiState: GuiState.settings;
+    property<GuiState> guiState: GuiState.editor;
 
     init => {
         // force the light theme regardless of the system color scheme
