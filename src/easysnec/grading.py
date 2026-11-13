@@ -9,10 +9,9 @@ from enum import Enum
 from functools import cached_property
 from pyxdameraulevenshtein import damerau_levenshtein_distance
 from collections.abc import Iterable
+from easysnec.courses import Course, ANIMAL_MAPPING, EMOJI_MAPPING
 
-
-def typed_function(a: int, b: str, c: bool) -> None:
-    print(a, b, c)
+import slint
 
 
 class SuccessStatus(Enum):
@@ -172,7 +171,7 @@ class Grade:
                 if self.missed_checkpoints:
                     scoring_output += (
                         "Missing checkpoints: "
-                        + ", ".join(self.missed_checkpoints)
+                        + ", ".join(map(str, self.missed_checkpoints))
                         + "\n"
                     )
                 if self.extra_checkpoints:
@@ -186,6 +185,59 @@ class Grade:
 
         return scoring_output
 
+    def to_slint(self, SlintGrade, SlintMistake, SlintMistakeType):
+        mistakes = [
+            SlintMistake(checkpoint=c + 1, type=SlintMistakeType.missed)
+            for c in self.missed_checkpoint_indices
+        ]
+
+        if not self.input_data.start_time:
+            mistakes.insert(
+                0,
+                SlintMistake(
+                    checkpoint=-1,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
+                    type=SlintMistakeType.no_start,
+                ),
+            )
+        if not self.input_data.finish_time:
+            mistakes.append(
+                SlintMistake(
+                    checkpoint=-2,  # This is a hack. Type should be sufficient but for whatever reason slint is struggling to detect it
+                    type=SlintMistakeType.no_finish,
+                )
+            )
+
+        if (
+            self.status != SuccessStatus.SUCCESS
+            and len(self.missed_checkpoint_indices) == 0
+            and self.input_data.start_time
+            and self.input_data.finish_time
+        ):
+            mistakes.append(SlintMistake(checkpoint=-3, type=SlintMistakeType.shuffle))
+
+        # TODO: There ought to be some sort of mapping from slint's enums to ours
+        if self.status == SuccessStatus.SUCCESS:
+            status = "success"
+        if self.status == SuccessStatus.INCOMPLETE:
+            status = "incomplete"
+        if self.status == SuccessStatus.MISSES:
+            status = "misses"
+
+        if not self.input_data.start_time or not self.input_data.finish_time:
+            time_text = ""
+        else:
+            time_delta = self.input_data.finish_time - self.input_data.start_time
+            minutes = int(time_delta.seconds / 60)
+            seconds = time_delta.seconds % 60
+            time_text = f"{minutes:02}:{seconds:02}"
+
+        return SlintGrade(
+            course=self.course.course_name,
+            result=status,
+            time=time_text,
+            mistakes=slint.ListModel(mistakes),
+        )
+
 
 @dataclass(frozen=True)
 class OutputData:
@@ -194,49 +246,3 @@ class OutputData:
     success_status: SuccessStatus
     missed_checkpoints: list[int]
 
-
-@dataclass(frozen=True)
-class Course:
-    course_name: str
-    is_score_o: bool
-    stations: list[int]
-
-
-COURSES = [
-    Course("Frog", False, [32, 40, 39, 38, 35, 34, 36, 37, 31, 33]),
-    Course("Octopus", False, [34, 36, 39, 40, 32, 33, 37, 38, 31, 35]),
-    Course("Penguin", False, [38, 39, 32, 34, 35, 36, 37, 33, 31, 40]),
-    Course("Sheep", False, [40, 36, 34, 31, 32, 33, 35, 37, 38, 39]),
-    Course("Lion", False, [31, 33, 36, 38, 39]),
-    Course("Dog", False, [33, 32, 40, 38, 34]),
-    Course("Bee", False, [35, 37, 38, 40, 33]),
-    Course("Bird", False, [36, 34, 31, 38, 37]),
-    Course("Elephant", False, [37, 34, 31, 40, 39]),
-    Course("Crab", False, [39, 31, 32, 35, 37]),
-]
-
-ANIMAL_MAPPING = {
-    "Frog": 32,
-    "Octopus": 34,
-    "Penguin": 38,
-    "Sheep": 40,
-    "Lion": 31,
-    "Dog": 33,
-    "Bee": 35,
-    "Bird": 36,
-    "Elephant": 37,
-    "Crab": 39,
-}
-
-EMOJI_MAPPING = {
-    32: "🐸",
-    34: "🐙",
-    38: "🐧",
-    40: "🐑",
-    31: "🦁",
-    33: "🐕",
-    35: "🐝",
-    36: "🐦",
-    37: "🐘",
-    39: "🦀",
-}
