@@ -169,7 +169,9 @@ class AppWindowPy(AppWindow):
     def _check_port_is_si(self, port:str) -> bool:
         print(f"checking port {port}...")
         try:
-            _ = self._serial_interface.bind_si_reader(port)
+            reader = self._serial_interface.bind_si_reader(port)
+            reader.disconnect()
+
             print("success!")
             return True
         except SIReaderException:
