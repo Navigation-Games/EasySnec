@@ -3,7 +3,7 @@ import { Theme } from "theme.slint";
 import { SettingsWindow } from "settings.slint";
 import { RunningWindow } from "running.slint";
 import { CourseEditor } from "course_editor.slint";
-import { Grade, GuiState, Course, Utils, Mistake, MistakeType } from "datatypes.slint";
+import { Grade, GuiState, Course, CourseSet, Utils, Mistake, MistakeType } from "datatypes.slint";
 import { MockSIController } from "mock_window.slint";
 
 export { Utils, Grade }
@@ -16,13 +16,21 @@ export component AppWindow inherits Window {
     in property<[string]> score_mode_options;
     out property<string> score_mode;
 
-    in-out property <[{name:string, enabled:bool}]> course_sets: [
-        {name: "Cambridge Plays", enabled: true},
-        {name: "Some other thing", enabled: false}
+    in-out property <[CourseSet]> course_sets: [
+        {name: "Cambridge Plays", courses: [
+            { name: "bird", checkpoints: [31, 35] },
+            { name: "bee", checkpoints: [31, 35] },
+        ], enabled: true},
+        {name: "Some other thing", courses: [
+            { name: "bat", checkpoints: [31, 35] },
+        ], enabled: false}
     ];
 
     in property <Grade> grade;
     in property <[string]> courses;
+
+    property <[Course]> course_editor_courses: course_sets[selected_course_set_idx].courses;
+    property <int> selected_course_set_idx: 0;
 
     callback request-decorative-button();
     callback request-connect-si(port:string);
@@ -30,7 +38,7 @@ export component AppWindow inherits Window {
     callback request-update-ports();
     callback request-update-time();
     callback request-regrade(course:string);
-    callback request-update-course-sets(course_sets:[{name:string, enabled:bool}]);
+    callback request-update-course-sets(course_sets:[CourseSet]);
 
     // if a callback result will be bound to something, mark it as pure so the constraint solver doesnt perish
     pure callback display-course(course:Course) -> string;
@@ -147,6 +155,7 @@ export component AppWindow inherits Window {
             request-regrade(course) => {request-regrade(course);}
         }
         if guiState == GuiState.editor: CourseEditor {
+            courses: course_editor_courses;
             display-course(course) => { display-course(course) }
         }
     }

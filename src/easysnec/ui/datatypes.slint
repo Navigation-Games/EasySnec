@@ -6,6 +6,7 @@ export struct Course {
 export struct CourseSet {
     name: string,
     enabled: bool,
+    courses: [Course]
 }
 
 export enum MistakeType {missed, shuffle, no-start, no-finish}
@@ -30,4 +31,7 @@ export enum GuiState {
 // unfortunately these are typed.
 export global Utils {
     pure callback find(array:[string], value: string) -> int;
+    pure callback course_to_string(course: [int]) -> string;
+    pure callback string_to_course(string) -> [int];
+    pure callback try_update_course(course:[int], update:string) -> [int];
 }

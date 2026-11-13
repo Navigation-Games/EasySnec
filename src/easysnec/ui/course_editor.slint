@@ -1,45 +1,135 @@
-import { AboutSlint, VerticalBox, ListView, HorizontalBox, TextEdit, Button, LineEdit } from "std-widgets.slint";
-import { Course } from "datatypes.slint";
+import {
+    AboutSlint,
+    VerticalBox,
+    ListView,
+    HorizontalBox,
+    TextEdit,
+    Button,
+    LineEdit,
+} from "std-widgets.slint";
+import { Course, Utils } from "datatypes.slint";
 
 export component CourseEditor inherits VerticalBox {
 
-    pure callback display_course(course:Course) -> string;
+    pure callback display_course(course: Course) -> string;
 
-    property <[Course]> courses: [
-        {name: "bird", checkpoints: [31,35]},
-        {name: "bee", checkpoints: [31,35]},
-        {name: "bat", checkpoints: [31,35]},
-    ];
+    property <int> selected_course_idx: -1;
+
+    in-out property <[Course]> courses;
 
     HorizontalBox {
         Text {
             text: "Course Editor";
         }
+
         Button {
             text: "New Course";
+            clicked => {
+                root.courses.push({
+                    name: "New Course",
+                    checkpoints: []
+                });
+            }
         }
     }
+
     ListView {
-        for course in courses: Button {
-            text: display_course(course);
-        }
+        for course[idx] in courses: HorizontalLayout {
+            Button {
+                horizontal-stretch: 1;
+                property <int> selected_course_idx: root.selected_course_idx;
+                init => {
+                    self.checked = selected_course_idx == idx;
+                }
 
-        // for course in courses: HorizontalBox {
-        //     Text { text: course; }
-        //     Rectangle { background: green; }
-        // }
+                changed selected_course_idx => {
+                    self.checked = selected_course_idx == idx;
+                }
+
+                checkable: true;
+                text: courses[idx].name;
+
+                clicked => {
+                    root.selected_course_idx = idx;
+                }
+            }
+
+            Button {
+                horizontal-stretch: 0;
+                text: "X";
+
+                clicked => {
+                    root.courses.remove(idx);
+                }
+            }
+        }
     }
 
-    LineEdit {}
+    LineEdit {
+        placeholder-text: "Name";
+
+        init => {
+          self.text = root.courses[selected_course_idx].name;
+        }
+
+        property <int> selected_course_idx: root.selected_course_idx;
+        changed selected_course_idx => {
+          self.text = root.courses[selected_course_idx].name;
+        }
+
+        changed text => {
+            root.courses[selected_course_idx].name = self.text;
+        }
+    }
+
+    courses_line := LineEdit {
+        placeholder-text: "Checkpoints";
+        property <int> selected_course_idx: root.selected_course_idx;
+        property <Course> selected_course: root.courses[selected_course_idx];
+        property <[int]> checkpoints: selected_course.checkpoints;
+        property <int> num_checkpoints: checkpoints.length;
+        init => {
+            self.text = Utils.course_to_string(root.courses[selected_course_idx].checkpoints);
+        }
+
+        changed selected_course_idx => self.update();
+        changed selected_course => self.update();
+        changed checkpoints => self.update();
+        changed num_checkpoints => self.update();
+
+        function update() {
+            self.text = Utils.course_to_string(root.courses[selected_course_idx].checkpoints);
+        }
+
+        changed text => {
+            root.courses[selected_course_idx].checkpoints = Utils.try_update_course(courses[selected_course_idx].checkpoints, self.text);
+        }
+    }
+
     // TextInput {}
 
     HorizontalBox {
-        for i in [
-            31,32,33,34,35,36,37,38,39,40
-        ]: Button {
+        for i in [31, 32, 33, 34, 35, 36, 37, 38, 39, 40]: Button {
             text: i;
+            enabled: selected_course_idx >= 0;
+
+            clicked => {
+                if root.courses[selected_course_idx].checkpoints.length == 0 {
+                    root.courses[selected_course_idx].checkpoints = [i];
+                } else {
+                    root.courses[selected_course_idx].checkpoints.push(i);
+                }
+            }
+        }
+
+        Button {
+            text: "X";
+            enabled: selected_course_idx >= 0;
+
+            clicked => {
+                courses_line.clear-focus();
+                root.courses[selected_course_idx].checkpoints.remove(root.courses[selected_course_idx].checkpoints.length - 1)
+            }
         }
     }
-
-
 }
